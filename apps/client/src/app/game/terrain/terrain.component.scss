@@ -1,0 +1,5 @@
+.terrain {
+  display: grid;
+  grid: repeat(var(--terrainRow), 1fr) / repeat(var(--terrainCol), 1fr);
+  gap: 1px;
+}

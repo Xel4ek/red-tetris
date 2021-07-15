@@ -1,0 +1,6 @@
+<div class='terrain'>
+  <red-tetris-mino *ngFor='let color of terrain | async trackBy: trackFn' [style.--color]="color"></red-tetris-mino>
+</div>
+<pre>
+{{terrain | async | json}}
+  </pre>

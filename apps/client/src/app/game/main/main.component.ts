@@ -8,10 +8,16 @@ import { WebsocketService } from '../../core/services/websocket/websocket.servic
 })
 export class MainComponent {
   constructor(private readonly ws: WebsocketService) {
-    ws.on('test').subscribe(console.log);
+    ws.on('playerTerrain').subscribe(console.log);
   }
 
   send(): void {
     this.ws.send('findAllGame');
+  }
+  start(): void {
+    this.ws.send('startGame');
+  }
+  stop(): void {
+    this.ws.send('stopGame');
   }
 }

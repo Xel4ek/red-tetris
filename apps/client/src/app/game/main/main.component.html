@@ -1,2 +1,7 @@
 <p>main works!</p>
-<div (click)="send()">click</div>
+<div [ngStyle]="{'width': '400px'}">
+  <red-tetris-terrain></red-tetris-terrain>
+</div>
+<div (click)="start()">Start</div>
+<div (click)="stop()">Stop</div>
+<div (click)="send()">Data</div>
