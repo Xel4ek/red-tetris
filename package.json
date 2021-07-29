@@ -27,7 +27,11 @@
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "typeorm": "ts-node --project apps/api/tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js src/main.ts",
+    "migration": "typeorm migration:run",
+    "migration:create": "typeorm migration:create -n",
+    "migration:revert": "typeorm migration:revert"
   },
   "private": true,
   "dependencies": {
@@ -47,9 +51,11 @@
     "@nestjs/platform-ws": "^7.6.18",
     "@nestjs/typeorm": "^7.1.5",
     "@nrwl/angular": "12.5.7",
+    "nest": "^0.1.6",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pg": "^8.6.0",
+    "postgres": "^1.0.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
