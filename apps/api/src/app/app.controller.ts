@@ -1,22 +1,26 @@
-import {Controller, Get, Post, Req, Request, UseGuards} from '@nestjs/common';
+import { Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
 
 import { Message } from '@red-tetris/api-interfaces';
 
 import { AppService } from './app.service';
-import { AuthGuard} from "@nestjs/passport";
+import { AuthGuard } from "@nestjs/passport";
+import { UsersService } from "../users/users.service";
+import { UserEntity } from "../users/user.entity";
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor (
+    private readonly appService: AppService) {
+  }
 
   @Get('hello')
-  getData(): Message {
+  getData (): Message {
     return this.appService.getData();
   }
 
   @UseGuards(AuthGuard("local"))
   @Post('auth/login')
-  async login(@Request() req) {
+  async login (@Request() req) {
     return req.user;
   }
 
