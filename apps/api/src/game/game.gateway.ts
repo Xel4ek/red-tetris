@@ -39,7 +39,10 @@ export class GameGateway implements OnGatewayConnection {
         client.send(JSON.stringify({ event: 'playerTerrain', data }));
       });
   }
-
+  @SubscribeMessage('registerGame ')
+  registerGame() {
+    return;
+  }
   @SubscribeMessage('playerTerrain')
   playerTerrain(): Observable<WsResponse> {
     return this.gameService

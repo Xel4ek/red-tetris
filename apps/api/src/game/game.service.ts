@@ -7,6 +7,7 @@ import { OnInit } from '@angular/core';
 
 @Injectable()
 export class GameService implements OnInit {
+  private readonly roomStore = [];
   private readonly _stop = new Subject<void>();
   private readonly _start = new Subject<void>();
   terrain$ = timer(0, 2000).pipe(

@@ -1,7 +1,23 @@
-<p>main works!</p>
-<div [ngStyle]="{'width': '400px'}">
-  <red-tetris-terrain></red-tetris-terrain>
-</div>
-<div (click)="start()">Start</div>
-<div (click)="stop()">Stop</div>
-<div (click)="send()">Data</div>
+<ng-container *ngIf='(error | async) else game'>
+  <div class="mat-error">
+    <pre>
+  Illegal room or player name. Room name and Player name are required. please follow ulr format:
+  • http:&#47;&#47;&#10092;server_name_or_ip&#10093;:&#10092;port&#10093;/#&#10092;room&#10093;[&#10092;player_name&#10093;]
+  room : name of the game to join,
+  player_name : name of the player
+    </pre>
+  </div>
+  <a href='/#ExaplerRoom[ExamplePlayerName]'>Example</a>
+</ng-container>
+<ng-template #game>
+  <code>
+    {{room}} | {{player}}
+  </code>
+  <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
+  <div [ngStyle]="{'width': '400px'}">
+    <red-tetris-terrain></red-tetris-terrain>
+  </div>
+  <div (click)="start()">Start</div>
+  <div (click)="stop()">Stop</div>
+  <div (click)="send()">Data</div>
+</ng-template>
