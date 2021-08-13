@@ -6,7 +6,7 @@ export enum Role {
 }
 export class PlayerDto {
   name: string;
-  channel: WebSocket; // temp solution
+  channel: WebSocket;
   room: string;
   role: Role;
 }
