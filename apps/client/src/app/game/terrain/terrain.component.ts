@@ -7,13 +7,6 @@ import { TERRAIN_SOURCE } from './token/terrain.token';
   selector: 'red-tetris-terrain',
   templateUrl: './terrain.component.html',
   styleUrls: ['./terrain.component.scss'],
-  providers: [
-    TerrainService,
-    {
-      provide: TERRAIN_SOURCE,
-      useValue: 'playerTerrain',
-    },
-  ],
 })
 export class TerrainComponent {
   terrain: Observable<string[]>;

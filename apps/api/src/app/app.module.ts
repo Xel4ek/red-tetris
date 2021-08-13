@@ -7,7 +7,7 @@ import { configService } from '../config/config.service';
 import { GameModule } from '../game/game.module';
 import { AuthModule } from '../auth/auth.module';
 import { SunboxModule } from '../sunbox/sunbox.module';
-import { UsersModule } from "../users/users.module";
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { UsersModule } from "../users/users.module";
     AuthModule,
     SunboxModule,
     AuthModule,
-    UsersModule
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -10,12 +10,18 @@
   <a href='/#ExaplerRoom[ExamplePlayerName]'>Example</a>
 </ng-container>
 <ng-template #game>
+  <red-tetris-init-game></red-tetris-init-game>
   <code>
     {{room}} | {{player}}
   </code>
   <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
-  <div [ngStyle]="{'width': '400px'}">
-    <red-tetris-terrain></red-tetris-terrain>
+  <div class="terrain-wrapper">
+    <div [ngStyle]="{'width': '400px'}">
+      <red-tetris-main-view></red-tetris-main-view>
+    </div>
+    <div [ngStyle]="{'width': '200px'}">
+      <red-tetris-other-view></red-tetris-other-view>
+    </div>
   </div>
   <div (click)="start()">Start</div>
   <div (click)="stop()">Stop</div>

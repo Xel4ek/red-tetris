@@ -1,7 +1,7 @@
 export enum Role {
   ANTONYMOUS,
   SPECTRAL,
-  PLAYERS,
+  PLAYER,
   ADMIN,
 }
 // export interface Role {

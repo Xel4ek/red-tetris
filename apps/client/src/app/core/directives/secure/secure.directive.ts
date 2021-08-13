@@ -6,9 +6,10 @@ import {
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
-import { RoleService } from '../../services/role/role.service';
 import { Role } from '../../interfaces/role';
 import { Subscription } from 'rxjs';
+import { ProfileService } from '../../services/profile/profile.service';
+import { Profile } from '../../interfaces/profile';
 
 @Directive({
   selector: '[redTetrisSecure]',
@@ -19,17 +20,19 @@ export class SecureDirective implements OnDestroy {
     private readonly element: ElementRef,
     private readonly templateRef: TemplateRef<any>,
     private readonly viewContainer: ViewContainerRef,
-    private readonly roleService: RoleService
+    private readonly roleService: ProfileService
   ) {}
   @Input()
   set redTetrisSecure(role: Role) {
-    this.subscription = this.roleService.role().subscribe((code) => {
-      if (code >= role) {
-        this.viewContainer.createEmbeddedView(this.templateRef);
-      } else {
-        this.viewContainer.clear();
-      }
-    });
+    this.subscription = this.roleService
+      .profile()
+      .subscribe(({ role: code }: Profile) => {
+        if (code >= role) {
+          this.viewContainer.createEmbeddedView(this.templateRef);
+        } else {
+          this.viewContainer.clear();
+        }
+      });
   }
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();

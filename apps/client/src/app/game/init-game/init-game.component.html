@@ -1,0 +1,18 @@
+<ng-container *ngIf='profile$ | async as profile'>
+  <mat-selection-list #shoes [multiple]="false" *ngIf='playerList$ | async as players' [disabled]='profile.role !== role.ADMIN'>
+    <mat-list-option *ngFor="let player of players" [value]="player" (click)='startGame(player)' [disabled]="player === profile.name">
+      {{player}}
+    </mat-list-option>
+  </mat-selection-list>
+  <ng-container *ngIf='!profile.inGame'>
+    <ng-container *ngIf='profile.role === role.ADMIN else wait'>
+      <div>      hello admin select enemy
+      </div>
+    </ng-container>
+    <ng-template #wait>
+      <div>
+        please wait game start
+      </div>
+    </ng-template>
+  </ng-container>
+</ng-container>
