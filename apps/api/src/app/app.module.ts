@@ -8,6 +8,7 @@ import { GameModule } from '../game/game.module';
 import { AuthModule } from '../auth/auth.module';
 import { SunboxModule } from '../sunbox/sunbox.module';
 import { UsersModule } from '../users/users.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UsersModule } from '../users/users.module';
     SunboxModule,
     AuthModule,
     UsersModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

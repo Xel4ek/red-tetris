@@ -7,9 +7,9 @@ import { OnInit } from '@angular/core';
 import { RegisterGameDto } from './dto/register-game.dto';
 import { PlayerDto, Role } from './dto/player.dto';
 import { WsMessage } from './dto/message.dto';
-import { RoomDto } from './dto/room.dto';
+import { RoomDto, Terrain } from './dto/room.dto';
 import { ProfileDto } from './dto/profile.dto';
-import { TerrainService } from '../terrain/terrain.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class GameService implements OnInit {
@@ -26,7 +26,7 @@ export class GameService implements OnInit {
     }),
     share()
   );
-  constructor(private readonly terrainService: TerrainService) {
+  constructor(private readonly eventEmitter: EventEmitter2) {
     console.log('terrain creation');
   }
   create(createGameDto: CreateGameDto) {
@@ -39,13 +39,14 @@ export class GameService implements OnInit {
       (p) => p.name === player && p.room === roomName
     );
     const room = this.roomStore.find((r) => r.name === roomName);
-
+    // TODO move logic in event
+    this.eventEmitter.emit('terrain.create', room);
     // error handling
     if (!room.inGame) {
       enemy.role = Role.PLAYER;
       room.inGame = true;
-      room.adminTerrain = this.terrainService.generateTerrain();
-      room.otherTerrain = this.terrainService.generateTerrain();
+      room._adminTerrain = new Terrain();
+      room._otherTerrain = new Terrain();
       this.multiCastRoomUpdateProfile(roomName);
       this.multiCastRoomTerrain(roomName);
     }
@@ -143,12 +144,7 @@ export class GameService implements OnInit {
     const { room, player } = registerGameDto;
     let role = Role.SPECTRAL;
     if (!this.roomStore.find((r) => r.name === room)) {
-      this.roomStore.push({
-        name: room,
-        adminTerrain: [],
-        otherTerrain: [],
-        inGame: false,
-      });
+      this.roomStore.push(new RoomDto(room));
       role = Role.ADMIN;
     }
     const con = this.playersStore.find((p) => p.channel === client);
@@ -220,4 +216,16 @@ export class GameService implements OnInit {
     }
   }
   ngOnInit(): void {}
+  @OnEvent('terrain.create')
+  terrainCreate(room: RoomDto): void {
+    console.log('Create terrain in room:', room);
+  }
+  @OnEvent('piece.rotate')
+  pieceRotate(room: RoomDto, direction: 'L' | 'R'): void {
+    console.log('Piece rotated', room, direction);
+  }
+  @OnEvent('piece.move')
+  pieceMove(room: RoomDto, direction: 'L' | 'R' | 'D'): void {
+    console.log('Piece moved', room, direction);
+  }
 }
