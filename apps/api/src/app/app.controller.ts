@@ -4,8 +4,6 @@ import { Message } from '@red-tetris/api-interfaces';
 
 import { AppService } from './app.service';
 import { AuthGuard } from "@nestjs/passport";
-import { UsersService } from "../users/users.service";
-import { UserEntity } from "../users/user.entity";
 
 @Controller()
 export class AppController {
