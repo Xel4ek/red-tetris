@@ -75,4 +75,10 @@ export class GameControlService implements OnDestroy {
   startGame(player: string) {
     this.ws.send('startGame', { player });
   }
+  rotate(direction: string) {
+    this.ws.send('pieceRotate', direction);
+  }
+  move(direction: string) {
+    this.ws.send('pieceMove', direction);
+  }
 }

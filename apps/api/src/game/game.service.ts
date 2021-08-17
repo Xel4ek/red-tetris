@@ -21,13 +21,13 @@ export class GameService implements OnInit {
     takeUntil(this._stop),
     repeatWhen(() => this._start),
     map(() => {
-      console.log(Date.now(), 'new data send!');
+      // console.log(Date.now(), 'new data send!');
       return this.spam();
     }),
     share()
   );
   constructor(private readonly eventEmitter: EventEmitter2) {
-    console.log('terrain creation');
+    // console.log('terrain creation');
   }
   create(createGameDto: CreateGameDto) {
     return 'This action adds a new game';
@@ -45,8 +45,10 @@ export class GameService implements OnInit {
     if (!room.inGame) {
       enemy.role = Role.PLAYER;
       room.inGame = true;
-      room._adminTerrain = new Terrain();
-      room._otherTerrain = new Terrain();
+      room._adminTerrain = new Terrain(this.eventEmitter);
+      room._otherTerrain = new Terrain(this.eventEmitter);
+      room._adminTerrain.start();
+      room._otherTerrain.start();
       this.multiCastRoomUpdateProfile(roomName);
       this.multiCastRoomTerrain(roomName);
     }
@@ -82,16 +84,16 @@ export class GameService implements OnInit {
     return Array.from({ length: 12 * 21 }, this.getRandomColor);
   }
   multiCastRoomUpdateProfile(room: string): void {
-    const inGame = this.roomStore.find((r) => (r.name = room));
+    const inGame = this.roomStore.find((r) => (r.name = room)).inGame;
     this.playersStore
       .filter((p) => p.room === room)
-      .map((p) =>
-        p.channel.send(
+      .map((pl) =>
+        pl.channel.send(
           JSON.stringify({
             event: 'profile',
             data: {
-              name: p.name,
-              role: p.role,
+              name: pl.name,
+              role: pl.role,
               inGame,
               room,
             },
@@ -164,7 +166,7 @@ export class GameService implements OnInit {
         this.playersStore.filter((pl) => pl.room === room).map((pl) => pl.name)
       ),
     ]);
-    console.log(this.playersStore);
+    // console.log(this.playersStore);
     return {
       event: 'profile',
       data: {
@@ -218,14 +220,43 @@ export class GameService implements OnInit {
   ngOnInit(): void {}
   @OnEvent('terrain.create')
   terrainCreate(room: RoomDto): void {
-    console.log('Create terrain in room:', room);
+    // console.log('Create terrain in room:', room);
   }
-  @OnEvent('piece.rotate')
-  pieceRotate(room: RoomDto, direction: 'L' | 'R'): void {
-    console.log('Piece rotated', room, direction);
+  pieceRotate(client: WebSocket, direction: 'l' | 'r'): void {
+    const player = this.playersStore.find((el) => el.channel === client);
+    if (player.role >= Role.PLAYER) {
+      const room = this.roomStore.find((room) => room.name === player.room);
+      if (player.role === Role.ADMIN) {
+        room._adminTerrain.rotate(direction);
+      }
+      if (player.role === Role.PLAYER) {
+        room._otherTerrain.rotate(direction);
+      }
+      this.multiCastRoomTerrain(room.name);
+    }
+    // console.log('Piece rotated', player, direction);
   }
   @OnEvent('piece.move')
-  pieceMove(room: RoomDto, direction: 'L' | 'R' | 'D'): void {
-    console.log('Piece moved', room, direction);
+  pieceMove(client: WebSocket, direction: 'l' | 'r' | 'd'): void {
+    const player = this.playersStore.find((el) => el.channel === client);
+    if (player.role >= Role.PLAYER) {
+      const room = this.roomStore.find((room) => room.name === player.room);
+      if (player.role === Role.ADMIN) {
+        room._adminTerrain.move(direction);
+      }
+      if (player.role === Role.PLAYER) {
+        room._otherTerrain.move(direction);
+      }
+      this.multiCastRoomTerrain(room.name);
+    }
+  }
+  @OnEvent('piece.update')
+  updatePiece(terrain: Terrain) {
+    const room = this.roomStore.find(
+      (room) => room._otherTerrain === terrain || room._adminTerrain === terrain
+    );
+    // console.log('colling method updatePiece', room.name);
+    this.multiCastRoomTerrain(room.name);
+    // console.log(room);
   }
 }

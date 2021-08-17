@@ -91,7 +91,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   remove(@MessageBody() id: number) {
     return this.gameService.remove(id);
   }
-
+  @SubscribeMessage('pieceRotate')
+  pieceRotate(
+    @MessageBody() direction: 'l' | 'r',
+    @ConnectedSocket() client: WebSocket
+  ) {
+    this.gameService.pieceRotate(client, direction);
+  }
+  @SubscribeMessage('pieceMove')
+  pieceMove(
+    @MessageBody() direction: 'l' | 'r' | 'd',
+    @ConnectedSocket() client: WebSocket
+  ) {
+    this.gameService.pieceMove(client, direction);
+  }
   handleDisconnect(client: WebSocket): void {
     this.gameService.disconnect(client);
   }

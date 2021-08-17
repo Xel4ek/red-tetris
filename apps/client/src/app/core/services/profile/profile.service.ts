@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { Role } from '../../interfaces/role';
 import { WebsocketService } from '../websocket/websocket.service';
 import { takeUntil, tap } from 'rxjs/operators';
