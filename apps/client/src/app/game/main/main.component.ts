@@ -84,15 +84,9 @@ export class MainComponent implements OnDestroy {
       if (event.code === 'KeyW') {
         this.gameControlService.rotate('l');
       }
-      if (
-        event.code === 'KeyA' ||
-        event.code === 'KeyD' ||
-        event.code === 'KeyS'
-      ) {
-        this.gameControlService.move(
-          event.code.charAt(event.code.length - 1).toLowerCase()
-        );
-      }
+      if (event.code === 'KeyA') this.gameControlService.move('l');
+      if (event.code === 'KeyD') this.gameControlService.move('r');
+      if (event.code === 'KeyS') this.gameControlService.move('d');
     }
   }
 }

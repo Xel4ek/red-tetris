@@ -1,6 +1,6 @@
 import { Piece, Pieces } from '../../terrain/piece';
-import { Observable, Subject, timer } from 'rxjs';
-import { delay, takeUntil, tap } from 'rxjs/operators';
+import { Subject, timer } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 export class RoomDto {
@@ -27,7 +27,7 @@ export class Terrain {
   private destroy$ = new Subject<void>();
   private updateTime = 1000;
   private pieceColor = Terrain.randomColor();
-  id = Date.now();
+  private missedRow = 0;
   terrain: string[];
   piece: Piece;
   position: number;
@@ -38,11 +38,60 @@ export class Terrain {
   }
   private resetPiece(): void {
     this.terrain = this.merge();
+    this.collapseRows();
     this.pieceColor = Terrain.randomColor();
     this.piece = Terrain.getRandomPiece();
     this.position = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
     if (!this.validate()) {
-      this.stop();
+      this.eventEmitter.emit('game.stop', this);
+    }
+  }
+  private collapseRows(): void {
+    const terrain = [];
+    let miss = 0;
+    for (let row = 0; row < Terrain.height; ++row) {
+      const terrainRow = this.terrain.slice(
+        row * Terrain.width,
+        (row + 1) * Terrain.width
+      );
+      if (
+        terrainRow.some((point) => point === Terrain.empty) ||
+        terrainRow.every((point) => point === Terrain.border)
+      ) {
+        terrain.push(...terrainRow);
+      } else {
+        ++miss;
+      }
+    }
+    if (miss) {
+      this.terrain = [
+        ...Array.from({ length: Terrain.width * miss }, (_, k) => {
+          if (
+            k % Terrain.width === 0 ||
+            k % Terrain.width === Terrain.width - 1
+          ) {
+            return Terrain.border;
+          }
+          return Terrain.empty;
+        }),
+        ...terrain,
+      ];
+      this.eventEmitter.emit('terrain.collapseRow', this, miss);
+    }
+  }
+
+  missRow(rows: number) {
+    if (
+      this.terrain
+        .slice(0, rows * Terrain.width)
+        .every((point) => point === Terrain.empty || point === Terrain.border)
+    ) {
+      this.terrain = [
+        ...this.terrain.slice(rows * Terrain.width),
+        ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
+      ];
+    } else {
+      this.eventEmitter.emit('game.stop', this);
     }
   }
   private static randomColor(): string {
@@ -82,11 +131,10 @@ export class Terrain {
       this.position -= 1;
     }
     if (direction === 'd') {
-      this.position += 12;
+      this.position += Terrain.width;
     }
     if (!this.validate()) {
       this.position = positionHolder;
-
       if (direction === 'd') {
         this.resetPiece();
       }
@@ -94,22 +142,25 @@ export class Terrain {
     return this;
   }
   private validate(): boolean {
+    // todo validation broken temp solution need refactor
+    const positionRow = Math.trunc(this.position / Terrain.width);
+    const positionCol = this.position % Terrain.width;
     return this.terrain
       .map((el, index) => {
         const row = Math.trunc(index / Terrain.width);
         const col = index % Terrain.width;
-        const positionRow = Math.trunc(this.position / Terrain.width);
-        const positionCol = this.position % Terrain.width;
         if (
           row >= positionRow &&
           row < positionRow + this.piece.size &&
           col >= positionCol &&
           col < positionCol + this.piece.size
         ) {
+          const pos =
+            (row - positionRow) * this.piece.size + (col - positionCol);
           if (
-            this.piece.piece[
-              (row - positionRow) * this.piece.size + (col - positionCol)
-            ] &&
+            pos >= 0 &&
+            pos < this.piece.show().length &&
+            this.piece.show()[pos] &&
             el !== Terrain.empty
           ) {
             return false;
@@ -120,18 +171,18 @@ export class Terrain {
       .every((el) => el);
   }
   merge(): string[] {
+    const positionRow = Math.trunc(this.position / Terrain.width);
+    const positionCol = this.position % Terrain.width;
     return this.terrain.map((el, index) => {
       const row = Math.trunc(index / Terrain.width);
       const col = index % Terrain.width;
-      const positionRow = Math.trunc(this.position / Terrain.width);
-      const positionCol = this.position % Terrain.width;
       if (
         row >= positionRow &&
         row < positionRow + this.piece.size &&
         col >= positionCol &&
         col < positionCol + this.piece.size
       ) {
-        return this.piece.piece[
+        return this.piece.show()[
           (row - positionRow) * this.piece.size + (col - positionCol)
         ]
           ? this.pieceColor

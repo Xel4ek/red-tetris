@@ -8,7 +8,7 @@ export enum Pieces {
   T = 'T',
 }
 export class Piece {
-  piece: boolean[];
+  private piece: boolean[];
   size: number;
   private static readonly pieceList: Readonly<Record<Pieces, boolean[]>> = {
     I: [
@@ -42,7 +42,14 @@ export class Piece {
   }
 
   rotate(direction: 'r' | 'l') {
-    this.piece = this.piece.reverse();
+    const piece = new Array(this.size * this.size);
+    for (let i = 0; i < this.piece.length; ++i) {
+      const row = Math.trunc(i / this.size);
+      const col = i % this.size;
+      piece[col * this.size + this.size - row - 1] =
+        this.piece[row * this.size + col];
+    }
+    this.piece = piece;
   }
   show(): boolean[] {
     return this.piece;

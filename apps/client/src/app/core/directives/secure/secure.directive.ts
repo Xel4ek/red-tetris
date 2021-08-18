@@ -27,10 +27,9 @@ export class SecureDirective implements OnDestroy {
     this.subscription = this.roleService
       .profile()
       .subscribe(({ role: code }: Profile) => {
+        this.viewContainer.clear();
         if (code >= role) {
           this.viewContainer.createEmbeddedView(this.templateRef);
-        } else {
-          this.viewContainer.clear();
         }
       });
   }

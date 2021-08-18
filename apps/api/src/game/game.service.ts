@@ -1,37 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
-import { Subject, timer } from 'rxjs';
-import { map, repeatWhen, share, takeUntil } from 'rxjs/operators';
-import { OnInit } from '@angular/core';
 import { RegisterGameDto } from './dto/register-game.dto';
-import { PlayerDto, Role } from './dto/player.dto';
+import { GameResult, PlayerDto, Role } from './dto/player.dto';
 import { WsMessage } from './dto/message.dto';
 import { RoomDto, Terrain } from './dto/room.dto';
 import { ProfileDto } from './dto/profile.dto';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
-export class GameService implements OnInit {
+export class GameService {
   private roomStore: RoomDto[] = [];
   private playersStore: PlayerDto[] = [];
-  private readonly _stop = new Subject<void>();
-  private readonly _start = new Subject<void>();
-  terrain$ = timer(0, 2000).pipe(
-    takeUntil(this._stop),
-    repeatWhen(() => this._start),
-    map(() => {
-      // console.log(Date.now(), 'new data send!');
-      return this.spam();
-    }),
-    share()
-  );
-  constructor(private readonly eventEmitter: EventEmitter2) {
-    // console.log('terrain creation');
-  }
-  create(createGameDto: CreateGameDto) {
-    return 'This action adds a new game';
-  }
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
   startGame(client: WebSocket, player: string) {
     const roomName = this.playersStore.find((p) => p.channel === client).room;
@@ -49,44 +28,14 @@ export class GameService implements OnInit {
       room._otherTerrain = new Terrain(this.eventEmitter);
       room._adminTerrain.start();
       room._otherTerrain.start();
-      this.multiCastRoomUpdateProfile(roomName);
-      this.multiCastRoomTerrain(roomName);
+      this.multiCastRoomUpdateProfile(room);
+      this.multiCastRoomTerrain(room);
     }
   }
 
-  stopGame() {
-    this._stop.next();
-  }
-
-  terrain() {
-    return this.terrain$;
-  }
-  findAll() {
-    return `This action returns all game`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} game`;
-  }
-
-  update(id: number, updateGameDto: UpdateGameDto) {
-    return `This action updates a #${id} game`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} game`;
-  }
-  getRandomColor(): string {
-    const color = Math.floor(0x1000000 * Math.random()).toString(16);
-    return '#' + ('000000' + color).slice(-6);
-  }
-  spam(): string[] {
-    return Array.from({ length: 12 * 21 }, this.getRandomColor);
-  }
-  multiCastRoomUpdateProfile(room: string): void {
-    const inGame = this.roomStore.find((r) => (r.name = room)).inGame;
+  multiCastRoomUpdateProfile(room: RoomDto): void {
     this.playersStore
-      .filter((p) => p.room === room)
+      .filter((p) => p.room === room.name)
       .map((pl) =>
         pl.channel.send(
           JSON.stringify({
@@ -94,20 +43,19 @@ export class GameService implements OnInit {
             data: {
               name: pl.name,
               role: pl.role,
-              inGame,
-              room,
+              inGame: room.inGame,
+              room: room.name,
             },
           })
         )
       );
   }
   multiCastRoomTerrain(
-    roomName: string,
+    room: RoomDto,
     target: 'admin' | 'other' | 'both' = 'both'
   ) {
-    const room = this.roomStore.find((r) => r.name === roomName);
     this.playersStore
-      .filter((pl) => pl.room === roomName)
+      .filter((pl) => pl.room === room.name)
       .map((pl) => {
         if (target === 'both' || target === 'admin') {
           pl.channel.send(
@@ -159,6 +107,7 @@ export class GameService implements OnInit {
         name: player,
         channel: client,
         room,
+        gameResult: GameResult.VACANT,
       });
     }
     this.multiCastRoom(room, 'playersList', [
@@ -217,7 +166,6 @@ export class GameService implements OnInit {
       ]);
     }
   }
-  ngOnInit(): void {}
   @OnEvent('terrain.create')
   terrainCreate(room: RoomDto): void {
     // console.log('Create terrain in room:', room);
@@ -232,11 +180,11 @@ export class GameService implements OnInit {
       if (player.role === Role.PLAYER) {
         room._otherTerrain.rotate(direction);
       }
-      this.multiCastRoomTerrain(room.name);
+      this.multiCastRoomTerrain(room);
     }
+
     // console.log('Piece rotated', player, direction);
   }
-  @OnEvent('piece.move')
   pieceMove(client: WebSocket, direction: 'l' | 'r' | 'd'): void {
     const player = this.playersStore.find((el) => el.channel === client);
     if (player.role >= Role.PLAYER) {
@@ -247,7 +195,7 @@ export class GameService implements OnInit {
       if (player.role === Role.PLAYER) {
         room._otherTerrain.move(direction);
       }
-      this.multiCastRoomTerrain(room.name);
+      this.multiCastRoomTerrain(room);
     }
   }
   @OnEvent('piece.update')
@@ -256,7 +204,33 @@ export class GameService implements OnInit {
       (room) => room._otherTerrain === terrain || room._adminTerrain === terrain
     );
     // console.log('colling method updatePiece', room.name);
-    this.multiCastRoomTerrain(room.name);
+    this.multiCastRoomTerrain(room);
     // console.log(room);
+  }
+  @OnEvent('game.stop')
+  gameStop(terrain?: Terrain) {
+    if (terrain) {
+      const room = this.getRoomByTerrain(terrain);
+      room._otherTerrain.stop();
+      room._adminTerrain.stop();
+      room.inGame = false;
+      this.multiCastRoomUpdateProfile(room);
+    }
+  }
+  @OnEvent('terrain.collapseRow')
+  CollapseRow(terrain: Terrain, miss: number) {
+    const room = this.getRoomByTerrain(terrain);
+    if (room._adminTerrain === terrain) {
+      room._otherTerrain.missRow(miss);
+    }
+    if (room._otherTerrain === terrain) {
+      room._adminTerrain.missRow(miss);
+    }
+    this.multiCastRoomTerrain(room);
+  }
+  getRoomByTerrain(terrain: Terrain) {
+    return this.roomStore.find(
+      (room) => room._otherTerrain === terrain || room._adminTerrain === terrain
+    );
   }
 }
