@@ -6,15 +6,7 @@ import { GameModule } from '../game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-  imports: [
-    // TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    GameModule,
-    // AuthModule,
-    // SunboxModule,
-    // AuthModule,
-    // UsersModule,
-    EventEmitterModule.forRoot(),
-  ],
+  imports: [GameModule, EventEmitterModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })

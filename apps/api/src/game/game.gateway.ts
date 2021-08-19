@@ -36,11 +36,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.gameService.registerGame(registerGameDto, client);
   }
   @SubscribeMessage('startGame')
-  startGame(
-    @MessageBody() { player }: { player: string },
-    @ConnectedSocket() client: WebSocket
-  ) {
-    this.gameService.startGame(client, player);
+  startGame(@ConnectedSocket() client: WebSocket) {
+    this.gameService.startGame(client);
   }
 
   @SubscribeMessage('pieceRotate')

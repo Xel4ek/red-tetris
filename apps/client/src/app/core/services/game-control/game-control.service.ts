@@ -72,8 +72,8 @@ export class GameControlService implements OnDestroy {
   playersList(): Observable<string[]> {
     return this.playersList$.asObservable();
   }
-  startGame(player: string) {
-    this.ws.send('startGame', { player });
+  startGame() {
+    this.ws.send('startGame');
   }
   rotate(direction: string) {
     this.ws.send('pieceRotate', direction);

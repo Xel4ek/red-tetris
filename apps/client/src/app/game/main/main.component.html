@@ -17,10 +17,10 @@
   <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
   <div class="terrain-wrapper">
     <div [ngStyle]="{'width': '400px'}">
-      <red-tetris-main-view></red-tetris-main-view>
+      <red-tetris-terrain player='adminTerrain' ></red-tetris-terrain>
     </div>
     <div [ngStyle]="{'width': '200px'}">
-      <red-tetris-other-view></red-tetris-other-view>
+      <red-tetris-terrain player='otherTerrain' ></red-tetris-terrain>
     </div>
   </div>
   <div (click)="start()">Start</div>

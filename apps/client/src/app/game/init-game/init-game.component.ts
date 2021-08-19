@@ -23,8 +23,8 @@ export class InitGameComponent implements OnInit {
     this.playerList$ = gameControlService.playersList();
     this.profile$ = profileService.profile();
   }
-  startGame(player: string): void {
-    this.gameControlService.startGame(player);
+  startGame(): void {
+    this.gameControlService.startGame();
   }
   ngOnInit(): void {}
 }

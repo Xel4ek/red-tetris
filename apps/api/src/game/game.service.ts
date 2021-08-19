@@ -12,7 +12,7 @@ export class GameService {
   private playersStore: PlayerDto[] = [];
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  startGame(client: WebSocket, player: string) {
+  startGame(client: WebSocket) {
     const roomName = this.playersStore.find((p) => p.channel === client).room;
     const enemy = this.playersStore.find(
       (p) => p.name === player && p.room === roomName
