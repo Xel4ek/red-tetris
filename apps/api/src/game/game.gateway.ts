@@ -8,10 +8,11 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
-import { CreateGameDto } from './dto/create-game.dto';
 import { Server } from 'ws';
 import { RegisterGameDto } from './dto/register-game.dto';
 import { WsMessage } from './dto/message.dto';
+import { UseGuards } from '@nestjs/common';
+import { RoleGuard } from './guards/role.guard';
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -35,6 +36,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): WsMessage<{ role: number; inGame: boolean }> {
     return this.gameService.registerGame(registerGameDto, client);
   }
+  @UseGuards(RoleGuard)
   @SubscribeMessage('startGame')
   startGame(@ConnectedSocket() client: WebSocket) {
     this.gameService.startGame(client);

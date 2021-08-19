@@ -1,5 +1,5 @@
 <ng-container *ngIf='(error | async) else game'>
-  <div class="mat-error">
+  <div class='mat-error'>
     <pre>
   Illegal room or player name. Room name and Player name are required. please follow ulr format:
   • http:&#47;&#47;&#10092;server_name_or_ip&#10093;:&#10092;port&#10093;/#&#10092;room&#10093;[&#10092;player_name&#10093;]
@@ -7,23 +7,34 @@
   player_name : name of the player
     </pre>
   </div>
-  <a href='/#ExaplerRoom[ExamplePlayerName]'>Example</a>
+  <a href='/#ExapleRoom[ExamplePlayerName]'>Example</a>
 </ng-container>
 <ng-template #game>
-  <red-tetris-init-game></red-tetris-init-game>
-  <code>
-    {{room}} | {{player}}
-  </code>
-  <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
-  <div class="terrain-wrapper">
-    <div [ngStyle]="{'width': '400px'}">
-      <red-tetris-terrain player='adminTerrain' ></red-tetris-terrain>
-    </div>
-    <div [ngStyle]="{'width': '200px'}">
-      <red-tetris-terrain player='otherTerrain' ></red-tetris-terrain>
-    </div>
-  </div>
-  <div (click)="start()">Start</div>
-  <div (click)="stop()">Stop</div>
-  <div (click)="send()">Data</div>
+  <ng-container *ngIf='profile$ | async as profile'>
+    <div>{{profile.room}} {{player}}</div>
+    <red-tetris-init-game></red-tetris-init-game>
+    {{profile | json}}
+<!--    <ng-container *ngIf='profile.inGame'>-->
+      <div class='terrain-wrapper'>
+        <ng-container *ngIf='playerList$ | async as playerList'>
+          <div *ngFor='let playerTerrain of playerList' [ngStyle]="{'width': '100px'}">
+            <red-tetris-terrain *ngIf='playerTerrain !== player' [player]="'terrain.' + playerTerrain"
+            ></red-tetris-terrain>
+          </div>
+        </ng-container>
+      </div>
+      <div [ngStyle]="{'width': '400px'}">
+        <red-tetris-terrain [player]="'terrain.' + player"></red-tetris-terrain>
+      </div>
+<!--    </ng-container>-->
+    <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
+    <!--    <div class='terrain-wrapper'>-->
+    <!--      <div [ngStyle]="{'width': '400px'}">-->
+    <!--        <red-tetris-terrain player='adminTerrain'></red-tetris-terrain>-->
+    <!--      </div>-->
+    <!--      <div [ngStyle]="{'width': '200px'}">-->
+    <!--        <red-tetris-terrain player='otherTerrain'></red-tetris-terrain>-->
+    <!--      </div>-->
+    <!--    </div>-->
+  </ng-container>
 </ng-template>

@@ -11,6 +11,7 @@ import { Observable, Subject } from 'rxjs';
 import { map, takeUntil, tap } from 'rxjs/operators';
 import { ProfileService } from '../../core/services/profile/profile.service';
 import { Role } from '../../core/interfaces/role';
+import { Profile } from '../../core/interfaces/profile';
 
 @Component({
   selector: 'red-tetris-main',
@@ -26,9 +27,9 @@ export class MainComponent implements OnDestroy {
   player?: string;
   error: Observable<boolean>;
   inGame = false;
-  role = Role.ANTONYMOUS;
   destroy$ = new Subject<void>();
-
+  profile$: Observable<Profile>;
+  playerList$: Observable<string[]>;
   constructor(
     private readonly ws: WebsocketService,
     private readonly location: Location,
@@ -36,6 +37,7 @@ export class MainComponent implements OnDestroy {
     private readonly activatedRoute: ActivatedRoute,
     private readonly profileService: ProfileService
   ) {
+    this.playerList$ = this.gameControlService.playersList();
     this.error = activatedRoute.fragment.pipe(
       map((fr) => {
         if (fr === null || !fr.endsWith(']')) {
@@ -52,16 +54,11 @@ export class MainComponent implements OnDestroy {
         }
       })
     );
-    profileService
-      .profile()
-      .pipe(
-        takeUntil(this.destroy$),
-        tap((profile) => {
-          this.inGame = profile.inGame;
-          this.role = profile.role;
-        })
-      )
-      .subscribe();
+    this.profile$ = profileService.profile().pipe(
+      tap((profile) => {
+        this.inGame = profile.inGame;
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -80,7 +77,7 @@ export class MainComponent implements OnDestroy {
   }
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    if (this.inGame && this.role >= Role.PLAYER) {
+    if (this.inGame) {
       if (event.code === 'KeyW') {
         this.gameControlService.rotate('l');
       }

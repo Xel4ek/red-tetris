@@ -16,6 +16,7 @@ export class TerrainComponent implements OnInit {
     return item;
   }
   ngOnInit(): void {
+    console.log('TerrainComponent ', this.player);
     this.terrainService.subscribe(this.player);
     this.terrain$ = this.terrainService.terrain();
   }
