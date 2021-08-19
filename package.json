@@ -51,6 +51,7 @@
     "@nestjs/mapped-types": "^0.4.1",
     "@nestjs/passport": "^8.0.0",
     "@nestjs/platform-express": "^7.0.0",
+    "@nestjs/platform-fastify": "^7.6.18",
     "@nestjs/platform-ws": "^7.6.18",
     "@nestjs/typeorm": "^7.1.5",
     "@nrwl/angular": "12.7.1",

@@ -3,29 +3,24 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { AppModule } from './app/app.module';
 import { WsAdapter } from '@nestjs/platform-ws';
-import * as session from 'express-session';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter()
+  );
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   app.useWebSocketAdapter(new WsAdapter(app));
-  app.use(
-    session({
-      secret: 'my-secret',
-      resave: false,
-      saveUninitialized: true,
-    })
-  );
   const port = process.env.PORT || 3333;
-  await app.listen(port, () => {
-    Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
-  });
+  await app.listen(port);
 }
 
 bootstrap();

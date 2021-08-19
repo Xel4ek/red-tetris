@@ -41,8 +41,8 @@ export class PlayerDto {
   }
   gameStart(): void {
     this.status = GameStatus.ACTIVE;
-
     this._terrain = new Terrain(this.eventEmitter);
+
     this._terrain.start();
     // console.log(this.eventEmitter);
     // console.log('game start ', this.name);
