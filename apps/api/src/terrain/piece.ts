@@ -10,28 +10,27 @@ export enum Pieces {
 export class Piece {
   private piece: boolean[];
   size: number;
-
   private static readonly pieceList: Readonly<Record<Pieces, boolean[]>> = {
     I: [
       false,
       false,
+      false,
+      false,
+      true,
+      true,
+      true,
       true,
       false,
       false,
       false,
-      true,
       false,
       false,
       false,
-      true,
       false,
-      false,
-      false,
-      true,
       false,
     ],
-    LL: [false, true, true, false, true, false, false, true, false],
-    RL: [true, true, false, false, true, false, false, true, false],
+    LL: [true, false, false, true, true, true, false, false, false],
+    RL: [false, false, true, true, true, true, false, false, false],
     RZ: [false, true, true, true, true, false, false, false, false],
     LZ: [true, true, false, false, true, true, false, false, false],
     S: [true, true, true, true],
@@ -54,5 +53,35 @@ export class Piece {
   }
   show(): boolean[] {
     return this.piece;
+  }
+}
+
+export class PieceGenerator {
+  private store = [];
+  private static tailSize = 4;
+  private static pieceCount = Object.keys(Pieces);
+  constructor() {
+    for (let i = 0; i < PieceGenerator.tailSize; ++i) {
+      this.store.push(PieceGenerator.generate());
+    }
+  }
+  private static generate() {
+    return new Piece(
+      Pieces[
+        PieceGenerator.pieceCount[
+          Math.floor(Math.random() * PieceGenerator.pieceCount.length)
+        ]
+      ]
+    );
+  }
+  getByIndex(i: number) {
+    if (i + PieceGenerator.tailSize === this.store.length) {
+      this.store.push(PieceGenerator.generate());
+    }
+    return this.store[i];
+  }
+
+  lastThree(since: number): Piece[] {
+    return this.store.slice(since + 1, since + PieceGenerator.tailSize);
   }
 }

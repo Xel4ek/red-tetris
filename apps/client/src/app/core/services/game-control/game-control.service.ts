@@ -19,6 +19,7 @@ export class GameControlService implements OnDestroy {
   private room$ = new ReplaySubject<string>(1);
   private player$ = new ReplaySubject<string>(1);
   private playersList$ = new ReplaySubject<string[]>(1);
+  private preview$ = new ReplaySubject<string[][]>(1);
   private destroy$ = new Subject<void>();
   private readonly error$: Observable<boolean>;
   constructor(
@@ -50,6 +51,12 @@ export class GameControlService implements OnDestroy {
         }
       })
     );
+    ws.on<string[][]>('pieceSerial.update')
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data) => this.preview$.next(data))
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
@@ -80,5 +87,8 @@ export class GameControlService implements OnDestroy {
   }
   move(direction: string) {
     this.ws.send('pieceMove', direction);
+  }
+  piecePreview() {
+    return this.preview$.asObservable();
   }
 }

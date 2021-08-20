@@ -1,5 +1,6 @@
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Terrain } from '../terrain/terrain';
+import { PieceGenerator } from '../../terrain/piece';
 
 export enum Role {
   ANTONYMOUS,
@@ -39,11 +40,12 @@ export class PlayerDto {
   gameStop(): void {
     console.log('game stop ', this.name);
   }
-  gameStart(): void {
+  gameStart(pieceGenerator: PieceGenerator): void {
     this.status = GameStatus.ACTIVE;
-    this._terrain = new Terrain(this.eventEmitter);
+    this._terrain = new Terrain(this.eventEmitter, pieceGenerator);
 
     this._terrain.start();
+
     // console.log(this.eventEmitter);
     // console.log('game start ', this.name);
   }
@@ -54,5 +56,8 @@ export class PlayerDto {
   loser() {
     this.status = GameStatus.LOSER;
     this._terrain.stop();
+  }
+  send(data: string) {
+    this.channels.map((c) => c.send(data));
   }
 }

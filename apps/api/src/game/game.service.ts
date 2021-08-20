@@ -22,84 +22,8 @@ export class GameService {
   startGame(client: WebSocket) {
     const roomName = this.playerRepository.findByChannel(client).room;
     this.roomRepository.gameStart(roomName);
-    // const roomName = this.playersStore.find((p) => p.channel === client).room;
-    // const enemy = this.playersStore.find(
-    //   (p) => p.name === player && p.room === roomName
-    // );
-    // const room = this.roomStore.find((r) => r.name === roomName);
-    // // TODO move logic in event
-    // this.eventEmitter.emit('terrain.create', room);
-    // // error handling
-    // if (!room.inGame) {
-    //   enemy.role = Role.PLAYER;
-    //   room.inGame = true;
-    //   room._adminTerrain = new Terrain(this.eventEmitter);
-    //   room._otherTerrain = new Terrain(this.eventEmitter);
-    //   room._adminTerrain.start();
-    //   room._otherTerrain.start();
-    //   this.multiCastRoomUpdateProfile(room);
-    //   this.multiCastRoomTerrain(room);
-    // }
   }
 
-  // multiCastRoomUpdateProfile(room: RoomDto): void {
-  //   this.playersStore
-  //     .filter((p) => p.room === room.name)
-  //     .map((pl) =>
-  //       pl.channels.map((channel) =>
-  //         channel.send(
-  //           JSON.stringify({
-  //             event: 'profile',
-  //             data: {
-  //               name: pl.name,
-  //               role: pl.role,
-  //               inGame: room.inGame,
-  //               room: room.name,
-  //             },
-  //           })
-  //         )
-  //       )
-  //     );
-  // }
-  // multiCastRoomTerrain(
-  //   room: RoomDto,
-  //   target: 'admin' | 'other' | 'both' = 'both'
-  // ) {
-  //   // this.playersStore
-  //   //   .filter((pl) => pl.room === room.name)
-  //   //   .map((pl) => {
-  //   //     if (target === 'both' || target === 'admin') {
-  //   //       pl.channel.send(
-  //   //         JSON.stringify({
-  //   //           event: 'adminTerrain',
-  //   //           data: room.adminTerrain,
-  //   //         })
-  //   //       );
-  //   //     }
-  //   //     if (target === 'both' || target === 'other') {
-  //   //       pl.channel.send(
-  //   //         JSON.stringify({
-  //   //           event: 'otherTerrain',
-  //   //           data: room.otherTerrain,
-  //   //         })
-  //   //       );
-  //   //     }
-  //   //   });
-  // }
-  // multiCastRoom(roomName: string, event: string, data: any): void {
-  //   this.playersStore
-  //     .filter((pl) => pl.room === roomName)
-  //     .map((pl) =>
-  //       pl.channels.map((channel) =>
-  //         channel.send(
-  //           JSON.stringify({
-  //             event,
-  //             data,
-  //           })
-  //         )
-  //       )
-  //     );
-  // }
   registerGame(
     registerGameDto: RegisterGameDto,
     client: WebSocket
@@ -124,13 +48,6 @@ export class GameService {
       this.playerRepository.push(
         new PlayerDto(room, player, role, client, this.eventEmitter)
       );
-      // this.playersStore.push({
-      //   role,
-      //   name: player,
-      //   channels: [client],
-      //   room,
-      //   gameResult: GameResult.VACANT,
-      // });
     }
     this.roomRepository.multicast(
       room,
@@ -151,46 +68,6 @@ export class GameService {
   }
   disconnect(client: WebSocket) {
     this.roomRepository.disconnect(client);
-    // const disconnectedPlayer = this.playersStore.find((pl) =>
-    //   pl.channels.find((channel) => channel === client)
-    // );
-    // this.playersStore = this.playersStore.filter((pl) =>
-    //   pl.channels.find((channel) => channel !== client)
-    // );
-    // this.multiCastRoom()
-    // if (disconnectedPlayer) {
-    //   if (disconnectedPlayer.role === Role.ADMIN) {
-    //     const updateAdmin = this.playersStore.find(
-    //       (p) => p.room === disconnectedPlayer.room
-    //     );
-    //     if (updateAdmin) {
-    //       updateAdmin.role = Role.ADMIN;
-    //       updateAdmin.channel.send(
-    //         JSON.stringify({
-    //           event: 'profile',
-    //           data: {
-    //             name: updateAdmin.name,
-    //             room: updateAdmin.room,
-    //             role: updateAdmin.role,
-    //             inGame: this.roomStore.find((r) => r.name === updateAdmin.room)
-    //               .inGame,
-    //           },
-    //         })
-    //       );
-    //     } else {
-    //       this.roomStore = this.roomStore.filter(
-    //         (room) => room.name !== disconnectedPlayer.room
-    //       );
-    //     }
-    //   }
-    //   this.multiCastRoom(disconnectedPlayer.room, 'playersList', [
-    //     ...new Set(
-    //       this.playersStore
-    //         .filter((pl) => pl.room === disconnectedPlayer.room)
-    //         .map((pl) => pl.name)
-    //     ),
-    //   ]);
-    // }
   }
 
   pieceRotate(client: WebSocket, direction: 'l' | 'r'): void {

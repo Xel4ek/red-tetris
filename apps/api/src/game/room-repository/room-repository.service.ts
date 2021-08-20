@@ -4,6 +4,7 @@ import { PlayerRepositoryService } from '../player-repository/player-repository.
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { GameStatus, Role } from '../dto/player.dto';
 import { Terrain } from '../terrain/terrain';
+import { PieceGenerator } from '../../terrain/piece';
 
 @Injectable()
 export class RoomRepositoryService {
@@ -39,7 +40,7 @@ export class RoomRepositoryService {
   multicast(roomName: string, data: string) {
     this.playerRepository
       .findByRoom(roomName)
-      .map((player) => player.channels.map((c) => c.send(data)));
+      .map((player) => player.send(data));
   }
 
   gameStart(roomName: string) {
@@ -47,7 +48,8 @@ export class RoomRepositoryService {
     room.inGame = true;
     this.profileMulticast(room);
     const players = this.playerRepository.findByRoom(roomName);
-    players.map((pl) => pl.gameStart());
+    const pieceGenerator = new PieceGenerator();
+    players.map((pl) => pl.gameStart(pieceGenerator));
   }
   @OnEvent('game.stop')
   gameStop(roomName: string) {
@@ -74,6 +76,7 @@ export class RoomRepositoryService {
   }
   disconnect(channel: WebSocket) {
     const player = this.playerRepository.findByChannel(channel);
+    if (!player) return;
     const room = this.findByName(player.room);
     if (room.inGame) {
       player.status = GameStatus.DISCONNECTED;

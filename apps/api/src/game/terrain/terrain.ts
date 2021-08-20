@@ -1,30 +1,35 @@
 import { Subject, timer } from 'rxjs';
-import { Piece, Pieces } from '../../terrain/piece';
+import { Piece, PieceGenerator } from '../../terrain/piece';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
   private static empty = '#ffffff';
   private static border = '#300144';
+  private static preview = '#6766669E';
+  private static previewRow = 6;
   private static width = 12;
   private static height = 21;
   private destroy$ = new Subject<void>();
   private updateTime = 1000;
   private pieceColor = Terrain.randomColor();
-  private missedRow = 0;
+  private pieceSerialNumber = 0;
   terrain: string[];
   piece: Piece;
   position: number;
-  constructor(private readonly eventEmitter: EventEmitter2) {
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly pieceGenerator: PieceGenerator
+  ) {
     this.terrain = Terrain.generateTerrain();
-    this.piece = Terrain.getRandomPiece();
+    this.piece = this.getNextPiece();
     this.position = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
   }
   private resetPiece(): void {
     this.terrain = this.merge();
     this.collapseRows();
     this.pieceColor = Terrain.randomColor();
-    this.piece = Terrain.getRandomPiece();
+    this.piece = this.getNextPiece();
     this.position = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
     if (!this.validate()) {
       this.eventEmitter.emit('terrain.overflow', this);
@@ -95,9 +100,33 @@ export class Terrain {
       return Terrain.empty;
     });
   }
-  private static getRandomPiece(): Piece {
-    const keys = Object.keys(Pieces);
-    return new Piece(Pieces[keys[Math.floor(Math.random() * keys.length)]]);
+  private getNextPiece(): Piece {
+    this.eventEmitter.emit(
+      'pieceSerial.update',
+      this,
+      this.pieceGenerator
+        .lastThree(this.pieceSerialNumber)
+        .map((p) => {
+          const formatted = Array.from(
+            { length: Terrain.previewRow * (p.size + 2) },
+            () => Terrain.empty
+          );
+          return formatted.map((el, index) => {
+            const row = Math.trunc(index / Terrain.previewRow) - 1;
+            const col = index % Terrain.previewRow;
+            if (row >= 0 && row < p.size) {
+              if (col > 0 && col <= p.size) {
+                return p.show()[row * p.size + col - 1]
+                  ? Terrain.preview
+                  : Terrain.empty;
+              }
+            }
+            return el;
+          });
+        })
+        .flat()
+    );
+    return this.pieceGenerator.getByIndex(this.pieceSerialNumber++);
   }
   rotate(direction: 'r' | 'l'): Terrain {
     this.piece.rotate(direction);

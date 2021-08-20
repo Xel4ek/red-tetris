@@ -23,9 +23,14 @@
           </div>
         </ng-container>
       </div>
+    <div class='terrain-wrapper'>
       <div [ngStyle]="{'width': '400px'}">
         <red-tetris-terrain [player]="'terrain.' + player"></red-tetris-terrain>
       </div>
+      <div [ngStyle]="{'width': '100px'}">
+        <red-tetris-terrain [player]="'pieceSerial.update'" [terrainRow]='10' [terrainCol]='6'></red-tetris-terrain>
+      </div>
+    </div>
 <!--    </ng-container>-->
     <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
     <!--    <div class='terrain-wrapper'>-->

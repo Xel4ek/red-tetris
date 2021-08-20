@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { GameStatus, PlayerDto, Role } from '../dto/player.dto';
+import { GameStatus, PlayerDto } from '../dto/player.dto';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Terrain } from '../terrain/terrain';
 
@@ -48,12 +48,25 @@ export class PlayerRepositoryService {
         winner = pl;
       }
     });
-    if (otherPlayers === 1) {
+    if (otherPlayers <= 1) {
+      winner = winner ?? player;
       winner.winner();
       this.eventEmitter.emit('game.stop', winner.room);
     }
     player.loser();
+
     // console.log('terrain.overflow ', terrain);
+  }
+  //this.eventEmitter.emit('pieceSerial.update', this, this.pieceSerialNumber);
+  @OnEvent('pieceSerial.update', { async: true })
+  pieceSerialUpdate(terrain: Terrain, lastThree: []) {
+    const player = this.findByTerrain(terrain);
+    player.send(
+      JSON.stringify({
+        event: 'pieceSerial.update',
+        data: { terrain: lastThree },
+      })
+    );
   }
   @OnEvent('terrain.collapseRow')
   collapseRow(terrain: Terrain, miss: number) {

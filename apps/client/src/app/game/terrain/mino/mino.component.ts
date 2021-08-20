@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, OnInit } from '@angular/core';
+import { Component, HostBinding, Input } from '@angular/core';
 
 @Component({
   selector: 'red-tetris-mino',
@@ -6,18 +6,14 @@ import { Component, HostBinding, Input, OnInit } from '@angular/core';
   styleUrls: ['./mino.component.scss'],
   styles: [
     `
-      .mino {
+      :host {
         background-color: var(--color);
       }
     `,
   ],
 })
-export class MinoComponent implements OnInit {
+export class MinoComponent {
   @HostBinding('style.--color')
   @Input()
   color!: string;
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }
