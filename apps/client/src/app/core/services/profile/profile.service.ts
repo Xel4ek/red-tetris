@@ -1,6 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
-import { Role } from '../../interfaces/role';
 import { WebsocketService } from '../websocket/websocket.service';
 import { takeUntil, tap } from 'rxjs/operators';
 import { Profile } from '../../interfaces/profile';
@@ -11,7 +10,6 @@ import { Profile } from '../../interfaces/profile';
 export class ProfileService implements OnDestroy {
   private profile$ = new ReplaySubject<Profile>(1);
   private destroy$ = new Subject<void>();
-  role = Role.ANTONYMOUS;
   constructor(private readonly websocketService: WebsocketService) {
     websocketService
       .on<Profile>('profile')
@@ -19,7 +17,6 @@ export class ProfileService implements OnDestroy {
         takeUntil(this.destroy$),
         tap((profile) => {
           this.profile$.next(profile);
-          this.role = profile.role;
         })
       )
       .subscribe();

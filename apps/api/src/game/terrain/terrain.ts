@@ -79,6 +79,7 @@ export class Terrain {
         ...this.terrain.slice(rows * Terrain.width),
         ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
       ];
+      this.share();
     } else {
       this.eventEmitter.emit('terrain.overflow', this);
     }
@@ -108,7 +109,7 @@ export class Terrain {
         .lastThree(this.pieceSerialNumber)
         .map((p) => {
           const formatted = Array.from(
-            { length: Terrain.previewRow * (p.size + 2) },
+            { length: Terrain.previewRow * (p.size + 1) },
             () => Terrain.empty
           );
           return formatted.map((el, index) => {
@@ -210,7 +211,6 @@ export class Terrain {
     });
   }
   start() {
-    console.log('start activated');
     this.share();
     timer(0, this.updateTime)
       .pipe(

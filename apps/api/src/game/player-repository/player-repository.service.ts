@@ -54,10 +54,7 @@ export class PlayerRepositoryService {
       this.eventEmitter.emit('game.stop', winner.room);
     }
     player.loser();
-
-    // console.log('terrain.overflow ', terrain);
   }
-  //this.eventEmitter.emit('pieceSerial.update', this, this.pieceSerialNumber);
   @OnEvent('pieceSerial.update', { async: true })
   pieceSerialUpdate(terrain: Terrain, lastThree: []) {
     const player = this.findByTerrain(terrain);
@@ -67,16 +64,5 @@ export class PlayerRepositoryService {
         data: { terrain: lastThree },
       })
     );
-  }
-  @OnEvent('terrain.collapseRow')
-  collapseRow(terrain: Terrain, miss: number) {
-    // const room = this.getRoomByTerrain(terrain);
-    // if (room._adminTerrain === terrain) {
-    //   room._otherTerrain.missRow(miss);
-    // }
-    // if (room._otherTerrain === terrain) {
-    //   room._adminTerrain.missRow(miss);
-    // }
-    // this.multiCastRoomTerrain(room);
   }
 }

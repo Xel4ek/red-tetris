@@ -4,6 +4,3 @@ export enum Role {
   PLAYER,
   ADMIN,
 }
-// export interface Role {
-//   role: number;
-// }

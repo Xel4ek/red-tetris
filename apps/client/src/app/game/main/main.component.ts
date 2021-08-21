@@ -31,7 +31,6 @@ export class MainComponent implements OnDestroy {
   profile$: Observable<Profile>;
   playerList$: Observable<string[]>;
   constructor(
-    private readonly ws: WebsocketService,
     private readonly location: Location,
     private readonly gameControlService: GameControlService,
     private readonly activatedRoute: ActivatedRoute,
@@ -64,16 +63,6 @@ export class MainComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  send(): void {
-    this.ws.send('findAllGame');
-  }
-  start(): void {
-    this.ws.send('startGame');
-  }
-  stop(): void {
-    this.ws.send('stopGame');
   }
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {

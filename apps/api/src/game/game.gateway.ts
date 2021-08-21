@@ -29,7 +29,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //     client.send(JSON.stringify({ event: 'playerTerrain', data }));
     //   });
   }
-  @SubscribeMessage('registerGame')
+  @SubscribeMessage('game.register')
   registerGame(
     @MessageBody() registerGameDto: RegisterGameDto,
     @ConnectedSocket() client: WebSocket
@@ -37,7 +37,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.gameService.registerGame(registerGameDto, client);
   }
   @UseGuards(RoleGuard)
-  @SubscribeMessage('startGame')
+  @SubscribeMessage('game.start')
   startGame(@ConnectedSocket() client: WebSocket) {
     this.gameService.startGame(client);
   }

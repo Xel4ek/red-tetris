@@ -11,8 +11,6 @@ import { Terrain } from './terrain/terrain';
 
 @Injectable()
 export class GameService {
-  // private roomStore: RoomDto[] = [];
-  // private playersStore: PlayerDto[] = [];
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly roomRepository: RoomRepositoryService,
@@ -39,7 +37,6 @@ export class GameService {
         role = Role.SPECTRAL;
       }
     }
-    // const existPlayer = this.playersStore.find(p => p.name === player && p.room === room);
     const con = this.playerRepository.findByChannel(client);
     if (con) {
       con.name = player;

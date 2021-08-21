@@ -91,4 +91,13 @@ export class RoomRepositoryService {
       this.store = this.store.filter((r) => r !== room);
     }
   }
+  @OnEvent('terrain.collapseRow')
+  collapseRow(terrain: Terrain, miss: number) {
+    const player = this.playerRepository.findByTerrain(terrain);
+    this.playerRepository.findByRoom(player.room).map((pl) => {
+      if (pl !== player) {
+        pl._terrain.missRow(miss);
+      }
+    });
+  }
 }
