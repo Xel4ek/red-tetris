@@ -1,0 +1,35 @@
+<div class='mat-error'>
+    <pre>
+  Illegal room or player name. Room name and Player name are required. please follow ulr format:
+  • http:&#47;&#47;&lt;server_name_or_ip&gt;:&lt;port&gt;/#&lt;room&gt;[&lt;player_name&gt;]
+  room: name of the game to join,
+  player_name: name of the player
+  or use follow form
+    </pre>
+</div>
+<div>
+  <form class="register-form" [formGroup]='registerFormGroup' (ngSubmit)='redirect()'>
+    <mat-form-field appearance="fill">
+      <mat-label>Lobby</mat-label>
+      <input type="text" matInput formControlName="lobby"
+             placeholder="MyLobby">
+      <mat-hint>Enter lobby name</mat-hint>
+      <mat-error *ngIf="registerFormGroup.controls['lobby'].invalid">
+        Lobby name is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input type="text" matInput formControlName="name"
+             placeholder="MyName">
+      <mat-hint>Enter nickname</mat-hint>
+      <mat-error *ngIf="registerFormGroup.controls['name'].invalid">
+        Name is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class='start-button' [ngStyle]="{'justify-content': 'space-between'}">
+      <button  type='button' mat-raised-button color="primary" routerLink='/about'>About Us</button>
+      <button  mat-raised-button color="primary" [disabled]='registerFormGroup.invalid'>Create lobby</button>
+    </div>
+  </form>
+</div>

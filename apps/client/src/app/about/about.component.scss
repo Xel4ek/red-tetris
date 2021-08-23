@@ -1,0 +1,46 @@
+:host {
+  font-size: 16px;
+  padding: 2rem;
+}
+.logo {
+  max-width: 81px;
+}
+
+.avatar {
+  overflow: hidden;
+  width: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+article {
+  text-indent: 1rem;
+  text-align: justify;
+  max-width: 840px;
+  margin: auto;
+  padding-bottom: 1rem;
+  line-height: 1.7;
+}
+.links {
+  display: flex;
+  justify-content: space-around;
+
+  &-block {
+  display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+.about-title {
+  font-size: 4rem;
+  font-weight: 500;
+  font-style: italic;
+  text-align: center;
+  text-shadow: 2px 2px 2px rgb(0 0 0 / 50%);
+  background: linear-gradient(
+      176deg
+    , #a20d0d, #ba1313 44%, #3cb52e 57%, #ccefb1);
+  padding: 2rem 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

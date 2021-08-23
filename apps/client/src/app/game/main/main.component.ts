@@ -8,9 +8,9 @@ import {
   GameControlService,
   GameSettings,
 } from '../../core/services/game-control/game-control.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { fromEvent, NEVER, Observable, Subject } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ProfileService } from '../../core/services/profile/profile.service';
 import { Profile } from '../../core/interfaces/profile';
 import { Title } from '@angular/platform-browser';
@@ -25,7 +25,6 @@ import { Title } from '@angular/platform-browser';
   ],
 })
 export class MainComponent implements OnDestroy {
-  error: Observable<boolean>;
   destroy$ = new Subject<void>();
   profile$: Observable<Profile>;
   playerList$: Observable<string[]>;
@@ -36,34 +35,42 @@ export class MainComponent implements OnDestroy {
     private readonly location: Location,
     private readonly gameControlService: GameControlService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly profileService: ProfileService
+    private readonly profileService: ProfileService,
+    private readonly router: Router
   ) {
     this.settings$ = gameControlService.settings();
-    this.error = activatedRoute.fragment.pipe(
-      map((fr) => {
-        if (fr === null || !fr.endsWith(']')) {
-          this.title.setTitle('Red Tetris: Error');
-          return true;
-        }
-        const [room, player] = fr
-          .split(/\[|]|%5B|%5D/)
-          .map((name) => name.replace('%20', ' ').trim());
-        if (player?.length && room?.length) {
-          gameControlService.register(room, player);
-          this.title.setTitle('Red Tetris: ' + room);
-          return false;
-        } else {
-          this.title.setTitle('Red Tetris: Error');
-          return true;
-        }
-      })
-    );
+    activatedRoute.fragment
+      .pipe(
+        takeUntil(this.destroy$),
+        map((fr) => {
+          if (fr === null || !fr.endsWith(']')) {
+            this.title.setTitle('Red Tetris: Error');
+            return true;
+          }
+          const [room, player] = fr
+            .split(/\[|]|%5B|%5D/)
+            .map((name) => name.replace('%20', ' ').trim());
+          if (player?.length && room?.length) {
+            gameControlService.register(room, player);
+            this.title.setTitle('Red Tetris: ' + room);
+            return false;
+          } else {
+            this.title.setTitle('Red Tetris: Error');
+            return true;
+          }
+        }),
+        tap((result) => {
+          if (result) this.router.navigate(['/welcome']);
+        })
+      )
+      .subscribe();
     this.profile$ = profileService.profile();
     this.profile$
       .pipe(
         switchMap(({ inGame }) =>
           inGame ? fromEvent<KeyboardEvent>(document, 'keydown') : NEVER
         ),
+        takeUntil(this.destroy$),
         tap(({ code }) => this.handleKeyboardEvent(code))
       )
       .subscribe();

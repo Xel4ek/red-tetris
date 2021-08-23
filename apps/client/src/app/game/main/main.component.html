@@ -1,16 +1,4 @@
-<ng-container *ngIf='(error | async) else game'>
-  <div class='mat-error'>
-    <pre>
-  Illegal room or player name. Room name and Player name are required. please follow ulr format:
-  • http:&#47;&#47;&#10092;server_name_or_ip&#10093;:&#10092;port&#10093;/#&#10092;room&#10093;[&#10092;player_name&#10093;]
-  room : name of the game to join,
-  player_name : name of the player
-    </pre>
-  </div>
-  <a href='/#ExapleRoom[ExamplePlayerName]'>Example</a>
-</ng-container>
-<ng-template #game>
-  <ng-container *ngIf='settings$ | async as settings'>
+<ng-container *ngIf='settings$ | async as settings'>
   <ng-container *ngIf='profile$ | async as profile'>
     <red-tetris-help status='success' style='text-align: center'>
       Welcome Red Tetris! `{{profile.room}}` lobby
@@ -36,16 +24,5 @@
       </div>
       <red-tetris-init-game></red-tetris-init-game>
     </div>
-<!--    </ng-container>-->
-    <!--<div (click)="location.go('roo!!m[roo dt]')">test</div>-->
-    <!--    <div class='terrain-wrapper'>-->
-    <!--      <div [ngStyle]="{'width': '400px'}">-->
-    <!--        <red-tetris-terrain player='adminTerrain'></red-tetris-terrain>-->
-    <!--      </div>-->
-    <!--      <div [ngStyle]="{'width': '200px'}">-->
-    <!--        <red-tetris-terrain player='otherTerrain'></red-tetris-terrain>-->
-    <!--      </div>-->
-    <!--    </div>-->
   </ng-container>
-  </ng-container>
-</ng-template>
+</ng-container>

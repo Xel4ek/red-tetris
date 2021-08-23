@@ -10,9 +10,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
 import { SecureModule } from './core/directives/secure/secure.module';
+import { WelcomeComponent } from './welcome/welcome.component';
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [AppComponent, SunboxComponent],
+  declarations: [AppComponent, SunboxComponent, WelcomeComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -21,6 +24,8 @@ import { SecureModule } from './core/directives/secure/secure.module';
     BrowserAnimationsModule,
     MatButtonModule,
     SecureModule,
+    MatInputModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
