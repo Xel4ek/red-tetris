@@ -5,7 +5,7 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { Profile } from '../../interfaces/profile';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'any',
 })
 export class ProfileService implements OnDestroy {
   private profile$ = new ReplaySubject<Profile>(1);

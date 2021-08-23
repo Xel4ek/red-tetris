@@ -1,16 +1,19 @@
-<div class='terrain-helper' *ngIf='{status: status$ | async} as data'>
+<ng-container *ngIf='terrain$ | async as terrain'>
+<div class='terrain-helper' *ngIf='{status: status$ | async} as data' #container>
+  <div *ngIf='title'>Player: {{title}}</div>
   <div class='terrain' [ngClass]="{'inactive' : data.status !== gameStatus.ACTIVE}">
-    <red-tetris-mino *ngFor='let color of terrain$ | async trackBy: trackFn' [style.--color]='color'></red-tetris-mino>
+    <red-tetris-mino *ngFor='let color of terrain trackBy: trackFn' [style.--color]='color'></red-tetris-mino>
   </div>
   <ng-container [ngSwitch]='data.status'>
     <div class='status looser'  (drag)="drag()" *ngSwitchCase='gameStatus.LOSER'>
       looser
     </div>
-    <div class='status looser' (drag)="drag()"  *ngSwitchCase='gameStatus.WINNER'>
+    <div class='status winner' (drag)="drag()"  *ngSwitchCase='gameStatus.WINNER'>
       winner
     </div>
-    <div class='status looser' (drag)="drag()" *ngSwitchCase='gameStatus.DISCONNECTED'>
+    <div class='status disconnect' (drag)="drag()" *ngSwitchCase='gameStatus.DISCONNECTED'>
       disconnect
     </div>
   </ng-container>
 </div>
+</ng-container>

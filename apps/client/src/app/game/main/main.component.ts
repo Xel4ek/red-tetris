@@ -1,5 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
-import { WebsocketService } from '../../core/services/websocket/websocket.service';
+import { Component, OnDestroy } from '@angular/core';
 import {
   HashLocationStrategy,
   Location,
@@ -11,7 +10,7 @@ import {
 } from '../../core/services/game-control/game-control.service';
 import { ActivatedRoute } from '@angular/router';
 import { fromEvent, NEVER, Observable, Subject } from 'rxjs';
-import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { ProfileService } from '../../core/services/profile/profile.service';
 import { Profile } from '../../core/interfaces/profile';
 
@@ -30,6 +29,7 @@ export class MainComponent implements OnDestroy {
   profile$: Observable<Profile>;
   playerList$: Observable<string[]>;
   settings$: Observable<GameSettings>;
+
   constructor(
     private readonly location: Location,
     private readonly gameControlService: GameControlService,
@@ -37,7 +37,6 @@ export class MainComponent implements OnDestroy {
     private readonly profileService: ProfileService
   ) {
     this.settings$ = gameControlService.settings();
-    this.playerList$ = this.gameControlService.playersList();
     this.error = activatedRoute.fragment.pipe(
       map((fr) => {
         if (fr === null || !fr.endsWith(']')) {
@@ -57,19 +56,26 @@ export class MainComponent implements OnDestroy {
     this.profile$ = profileService.profile();
     this.profile$
       .pipe(
-        takeUntil(this.destroy$),
         switchMap(({ inGame }) =>
           inGame ? fromEvent<KeyboardEvent>(document, 'keydown') : NEVER
         ),
         tap(({ code }) => this.handleKeyboardEvent(code))
       )
       .subscribe();
+    this.playerList$ = this.profile$.pipe(
+      switchMap(({ name }) =>
+        this.gameControlService
+          .playersList()
+          .pipe(map((data) => data.filter((p) => p !== name)))
+      )
+    );
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
   handleKeyboardEvent(code: string) {
     if (code === 'KeyW') {
       this.gameControlService.rotate('l');

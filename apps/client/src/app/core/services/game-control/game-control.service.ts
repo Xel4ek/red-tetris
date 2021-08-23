@@ -10,18 +10,22 @@ export interface GameStatus {
   pieceNumber: number;
   level: number;
 }
+
 export interface GameSettings {
   width: number;
   height: number;
   previewRow: number;
   border: string;
 }
+
 export interface GameInfo {
-  score: number;
   level: number;
+  score: number;
+  piece: number;
 }
+
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'any',
 })
 export class GameControlService implements OnDestroy {
   private readonly room$ = new ReplaySubject<string>(1);
@@ -33,6 +37,7 @@ export class GameControlService implements OnDestroy {
   private readonly info$ = new ReplaySubject<GameInfo>(1);
   private destroy$ = new Subject<void>();
   private readonly error$: Observable<boolean>;
+
   constructor(
     private readonly ws: WebsocketService,
     private readonly activatedRoute: ActivatedRoute
@@ -92,39 +97,51 @@ export class GameControlService implements OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
   register(room: string, player: string): void {
     this.ws.send('game.register', { room, player });
   }
+
   player(): Observable<string> {
     return this.player$.asObservable();
   }
+
   room(): Observable<string> {
     return this.room$.asObservable();
   }
+
   error(): Observable<boolean> {
     return this.error$;
   }
+
   playersList(): Observable<string[]> {
     return this.playersList$.asObservable();
   }
+
   startGame() {
     this.ws.send('game.start');
   }
+
   rotate(direction: string) {
     this.ws.send('pieceRotate', direction);
   }
+
   move(direction: string) {
     this.ws.send('pieceMove', direction);
   }
+
   piecePreview() {
     return this.preview$.asObservable();
   }
+
   status(): Observable<GameStatus> {
     return this.status$.asObservable();
   }
+
   settings(): Observable<GameSettings> {
     return this.settings$.asObservable();
   }
+
   info(): Observable<GameInfo> {
     return this.info$.asObservable();
   }

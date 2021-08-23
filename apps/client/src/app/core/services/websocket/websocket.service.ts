@@ -23,7 +23,7 @@ import {
 import { config } from './websocket.config';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'any',
 })
 export class WebsocketService implements IWebsocketService, OnDestroy {
   public status: Observable<boolean>;
@@ -111,7 +111,7 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
       this.websocket$?.next({ event, data });
     } else {
       this.status.pipe(first()).subscribe({
-        next: (_) => this.websocket$?.next({ event, data }),
+        next: () => this.websocket$?.next({ event, data }),
         error: () => console.error('Send error'),
       });
     }

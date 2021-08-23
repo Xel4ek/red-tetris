@@ -16,24 +16,24 @@
     <red-tetris-init-game></red-tetris-init-game>
     {{profile | json}}
 <!--    <ng-container *ngIf='profile.inGame'>-->
-      <div class='terrain-wrapper'>
+      <div class='terrain-wrapper enemy-terrain-wrapper'>
         <ng-container *ngIf='playerList$ | async as playerList'>
-          <div *ngFor='let playerTerrain of playerList' [ngStyle]="{'width': '100px'}">
-            <red-tetris-terrain *ngIf='playerTerrain !== profile.name' [player]="'terrain.' + playerTerrain"
+          <div *ngFor='let playerTerrain of playerList' class='enemy-terrain'>
+            <red-tetris-terrain [player]="'terrain.' + playerTerrain" [title]='playerTerrain'
                                 [terrainCol]='settings.width'
             ></red-tetris-terrain>
           </div>
         </ng-container>
       </div>
-    <div class='terrain-wrapper'>
+    <div class='terrain-wrapper main-wrapper'>
       <div [ngStyle]="{'width': '400px'}">
         <red-tetris-terrain [player]="'terrain.' + profile.name" [terrainCol]='settings.width'></red-tetris-terrain>
       </div>
       <div class='info-wrapper'>
-      <red-tetris-info-widget></red-tetris-info-widget>
-      <div [ngStyle]="{'width': '100px'}">
-        <red-tetris-terrain [player]="'pieceSerial.update'" [terrainCol]='settings.previewRow'></red-tetris-terrain>
-      </div>
+        <red-tetris-info-widget></red-tetris-info-widget>
+        <div [ngStyle]="{'width': '100px'}">
+          <red-tetris-terrain [player]="'pieceSerial.update'" [terrainCol]='settings.previewRow'></red-tetris-terrain>
+        </div>
       </div>
     </div>
 <!--    </ng-container>-->

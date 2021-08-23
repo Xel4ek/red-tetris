@@ -1,4 +1,4 @@
-import { BehaviorSubject, interval, Subject, timer } from 'rxjs';
+import { BehaviorSubject, interval, Subject } from 'rxjs';
 import { Piece, PieceGenerator } from '../../terrain/piece';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
@@ -12,6 +12,9 @@ export class Terrain {
   private static levelUpRows = 10;
   private static width = 12;
   private static height = 21;
+  terrain: string[];
+  piece: Piece;
+  position: number;
   private destroy$ = new Subject<void>();
   private updateTime = new BehaviorSubject<number>(1000);
   private pieceColor = Terrain.randomColor();
@@ -19,9 +22,8 @@ export class Terrain {
   private score: number;
   private level: number;
   private removedRows: number;
-  terrain: string[];
-  piece: Piece;
-  position: number;
+  private inGame = false;
+
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly pieceGenerator: PieceGenerator
@@ -33,6 +35,150 @@ export class Terrain {
     this.level = 1;
     this.removedRows = 0;
   }
+
+  public static settings() {
+    return {
+      width: Terrain.width,
+      height: Terrain.height,
+      previewRow: Terrain.previewRow,
+      border: Terrain.border,
+    };
+  }
+
+  private static randomColor(): string {
+    return (
+      '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6)
+    );
+  }
+
+  private static generateTerrain(): string[] {
+    return Array.from({ length: Terrain.width * Terrain.height }, (v, k) => {
+      if (
+        Math.trunc(k / Terrain.width) === Terrain.height - 1 ||
+        k % Terrain.width === 0 ||
+        k % Terrain.width === Terrain.width - 1
+      ) {
+        return Terrain.border;
+      }
+      return Terrain.empty;
+    });
+  }
+
+  updateScore(miss: number) {
+    this.score += this.level * Terrain.baseScore * miss;
+    this.removedRows += miss;
+    const level = Math.trunc(this.removedRows / Terrain.levelUpRows);
+    if (level !== this.level) {
+      this.level = level;
+      this.updateTime.next(this.updateTime.getValue() * 0.9);
+    }
+  }
+
+  missRow(rows: number) {
+    if (
+      this.terrain
+        .slice(0, rows * Terrain.width)
+        .every((point) => point === Terrain.empty || point === Terrain.border)
+    ) {
+      this.terrain = [
+        ...this.terrain.slice(rows * Terrain.width),
+        ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
+      ];
+      this.share();
+    } else {
+      this.eventEmitter.emit('terrain.overflow', this);
+    }
+  }
+
+  rotate(direction: 'r' | 'l'): Terrain {
+    if (!this.inGame) return this;
+    this.piece.rotate(direction);
+    if (!this.validate()) {
+      this.piece.rotate(direction === 'r' ? 'l' : 'r');
+    } else {
+      this.share();
+    }
+    return this;
+  }
+
+  move(direction: 'l' | 'r' | 'd'): Terrain {
+    if (!this.inGame) return this;
+    const positionHolder = this.position;
+    if (direction === 'r') {
+      this.position += 1;
+    }
+    if (direction === 'l') {
+      this.position -= 1;
+    }
+    if (direction === 'd') {
+      this.position += Terrain.width;
+    }
+    if (!this.validate()) {
+      this.position = positionHolder;
+      if (direction === 'd') {
+        this.resetPiece();
+        this.share();
+      }
+    } else {
+      this.share();
+    }
+    return this;
+  }
+
+  merge(): string[] {
+    const positionRow = Math.trunc(this.position / Terrain.width);
+    const positionCol = this.position % Terrain.width;
+    return this.terrain.map((el, index) => {
+      const row = Math.trunc(index / Terrain.width);
+      const col = index % Terrain.width;
+      if (
+        row >= positionRow &&
+        row < positionRow + this.piece.size &&
+        col >= positionCol &&
+        col < positionCol + this.piece.size
+      ) {
+        return this.piece.show()[
+          (row - positionRow) * this.piece.size + (col - positionCol)
+        ]
+          ? this.pieceColor
+          : el;
+      }
+      return el;
+    });
+  }
+
+  start() {
+    this.inGame = true;
+    this.share();
+    this.updateTime
+      .pipe(
+        switchMap((time) => interval(time)),
+        takeUntil(this.destroy$),
+        tap(() => this.move('d'))
+      )
+      .subscribe();
+  }
+
+  stop() {
+    this.inGame = false;
+    this.share();
+    console.log('game stop');
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  share() {
+    this.eventEmitter.emit('terrain.update', this);
+  }
+
+  status() {
+    return {
+      level: this.level,
+      score: this.score,
+      piece: this.pieceSerialNumber,
+    };
+  }
+
   private resetPiece(): void {
     this.terrain = this.merge();
     this.collapseRows();
@@ -43,14 +189,7 @@ export class Terrain {
       this.eventEmitter.emit('terrain.overflow', this);
     }
   }
-  public static settings() {
-    return {
-      width: Terrain.width,
-      height: Terrain.height,
-      previewRow: Terrain.previewRow,
-      border: Terrain.border,
-    };
-  }
+
   private collapseRows(): void {
     const terrain = [];
     let miss = 0;
@@ -85,48 +224,7 @@ export class Terrain {
       this.eventEmitter.emit('terrain.collapseRow', this, miss);
     }
   }
-  updateScore(miss: number) {
-    this.score += this.level * Terrain.baseScore * miss;
-    this.removedRows += miss;
-    const level = Math.trunc(this.removedRows / 10);
-    if (level !== this.level) {
-      this.level = Math.trunc(this.removedRows / 10);
-      const speed = this.updateTime.getValue();
-      this.updateTime.next(speed * 0.9);
-    }
-  }
-  missRow(rows: number) {
-    if (
-      this.terrain
-        .slice(0, rows * Terrain.width)
-        .every((point) => point === Terrain.empty || point === Terrain.border)
-    ) {
-      this.terrain = [
-        ...this.terrain.slice(rows * Terrain.width),
-        ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
-      ];
-      this.share();
-    } else {
-      this.eventEmitter.emit('terrain.overflow', this);
-    }
-  }
-  private static randomColor(): string {
-    return (
-      '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6)
-    );
-  }
-  private static generateTerrain(): string[] {
-    return Array.from({ length: Terrain.width * Terrain.height }, (v, k) => {
-      if (
-        Math.trunc(k / Terrain.width) === Terrain.height - 1 ||
-        k % Terrain.width === 0 ||
-        k % Terrain.width === Terrain.width - 1
-      ) {
-        return Terrain.border;
-      }
-      return Terrain.empty;
-    });
-  }
+
   private getNextPiece(): Piece {
     this.eventEmitter.emit(
       'pieceSerial.update',
@@ -155,37 +253,7 @@ export class Terrain {
     );
     return this.pieceGenerator.getByIndex(this.pieceSerialNumber++);
   }
-  rotate(direction: 'r' | 'l'): Terrain {
-    this.piece.rotate(direction);
-    if (!this.validate()) {
-      this.piece.rotate(direction === 'r' ? 'l' : 'r');
-    } else {
-      this.share();
-    }
-    return this;
-  }
-  move(direction: 'l' | 'r' | 'd'): Terrain {
-    const positionHolder = this.position;
-    if (direction === 'r') {
-      this.position += 1;
-    }
-    if (direction === 'l') {
-      this.position -= 1;
-    }
-    if (direction === 'd') {
-      this.position += Terrain.width;
-    }
-    if (!this.validate()) {
-      this.position = positionHolder;
-      if (direction === 'd') {
-        this.resetPiece();
-        this.share();
-      }
-    } else {
-      this.share();
-    }
-    return this;
-  }
+
   private validate(): boolean {
     // todo validation broken temp solution need refactor
     const positionRow = Math.trunc(this.position / Terrain.width);
@@ -214,50 +282,5 @@ export class Terrain {
         return true;
       })
       .every((el) => el);
-  }
-  merge(): string[] {
-    const positionRow = Math.trunc(this.position / Terrain.width);
-    const positionCol = this.position % Terrain.width;
-    return this.terrain.map((el, index) => {
-      const row = Math.trunc(index / Terrain.width);
-      const col = index % Terrain.width;
-      if (
-        row >= positionRow &&
-        row < positionRow + this.piece.size &&
-        col >= positionCol &&
-        col < positionCol + this.piece.size
-      ) {
-        return this.piece.show()[
-          (row - positionRow) * this.piece.size + (col - positionCol)
-        ]
-          ? this.pieceColor
-          : el;
-      }
-      return el;
-    });
-  }
-  start() {
-    this.share();
-    this.updateTime
-      .pipe(
-        switchMap((time) => interval(time)),
-        takeUntil(this.destroy$),
-        tap(() => this.move('d'))
-      )
-      .subscribe();
-  }
-  stop() {
-    console.log('game stop');
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-  share() {
-    this.eventEmitter.emit('terrain.update', this);
-  }
-  status() {
-    return {
-      score: this.score,
-      level: this.level,
-    };
   }
 }

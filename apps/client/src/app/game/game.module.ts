@@ -10,10 +10,13 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { SecureModule } from '../core/directives/secure/secure.module';
 import { MatButtonModule } from '@angular/material/button';
 import { InfoWidgetComponent } from './info-widget/info-widget.component';
+import { WebsocketModule } from '../core/services/websocket/websocket.module';
+import { environment } from '../../environments/environment';
 
 @NgModule({
   declarations: [MainComponent, InitGameComponent, InfoWidgetComponent],
   imports: [
+    WebsocketModule.config({ url: environment.ws }),
     CommonModule,
     GameRoutingModule,
     TerrainModule,

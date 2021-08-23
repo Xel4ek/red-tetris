@@ -1,7 +1,19 @@
 .terrain-wrapper {
   display: flex;
 }
+.main-wrapper {
+  gap: 5rem;
+  padding-left: 2rem;
+}
 .info-wrapper {
   display: flex;
   flex-direction: column;
+}
+.enemy-terrain {
+  width: 150px;
+}
+.enemy-terrain-wrapper {
+  flex-wrap: wrap;
+  justify-content: normal;
+  gap: 2rem;
 }
