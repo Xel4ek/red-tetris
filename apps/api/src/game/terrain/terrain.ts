@@ -14,7 +14,8 @@ export class Terrain {
   private static height = 21;
   terrain: string[];
   piece: Piece;
-  position: number;
+  x: number;
+  y: number;
   private destroy$ = new Subject<void>();
   private updateTime = new BehaviorSubject<number>(1000);
   private pieceColor = Terrain.randomColor();
@@ -30,7 +31,8 @@ export class Terrain {
   ) {
     this.terrain = Terrain.generateTerrain();
     this.piece = this.getNextPiece();
-    this.position = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.x = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.y = 0;
     this.score = 0;
     this.level = 1;
     this.removedRows = 0;
@@ -103,18 +105,20 @@ export class Terrain {
 
   move(direction: 'l' | 'r' | 'd'): Terrain {
     if (!this.inGame) return this;
-    const positionHolder = this.position;
+    const posX = this.x;
+    const posY = this.y;
     if (direction === 'r') {
-      this.position += 1;
+      this.x += 1;
     }
     if (direction === 'l') {
-      this.position -= 1;
+      this.x -= 1;
     }
     if (direction === 'd') {
-      this.position += Terrain.width;
+      this.y += 1;
     }
     if (!this.validate()) {
-      this.position = positionHolder;
+      this.x = posX;
+      this.y = posY;
       if (direction === 'd') {
         this.resetPiece();
         this.share();
@@ -126,8 +130,8 @@ export class Terrain {
   }
 
   merge(): string[] {
-    const positionRow = Math.trunc(this.position / Terrain.width);
-    const positionCol = this.position % Terrain.width;
+    const positionRow = this.y;
+    const positionCol = this.x;
     return this.terrain.map((el, index) => {
       const row = Math.trunc(index / Terrain.width);
       const col = index % Terrain.width;
@@ -184,7 +188,8 @@ export class Terrain {
     this.collapseRows();
     this.pieceColor = Terrain.randomColor();
     this.piece = this.getNextPiece();
-    this.position = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.x = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.y = 0;
     if (!this.validate()) {
       this.eventEmitter.emit('terrain.overflow', this);
     }
@@ -256,8 +261,8 @@ export class Terrain {
 
   private validate(): boolean {
     // todo validation broken temp solution need refactor
-    const positionRow = Math.trunc(this.position / Terrain.width);
-    const positionCol = this.position % Terrain.width;
+    const positionRow = this.y;
+    const positionCol = this.x;
     return this.terrain
       .map((el, index) => {
         const row = Math.trunc(index / Terrain.width);
