@@ -13,6 +13,7 @@ import { fromEvent, NEVER, Observable, Subject } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { ProfileService } from '../../core/services/profile/profile.service';
 import { Profile } from '../../core/interfaces/profile';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'red-tetris-main',
@@ -31,6 +32,7 @@ export class MainComponent implements OnDestroy {
   settings$: Observable<GameSettings>;
 
   constructor(
+    private readonly title: Title,
     private readonly location: Location,
     private readonly gameControlService: GameControlService,
     private readonly activatedRoute: ActivatedRoute,
@@ -40,6 +42,7 @@ export class MainComponent implements OnDestroy {
     this.error = activatedRoute.fragment.pipe(
       map((fr) => {
         if (fr === null || !fr.endsWith(']')) {
+          this.title.setTitle('Red Tetris: Error');
           return true;
         }
         const [room, player] = fr
@@ -47,8 +50,10 @@ export class MainComponent implements OnDestroy {
           .map((name) => name.replace('%20', ' ').trim());
         if (player?.length && room?.length) {
           gameControlService.register(room, player);
+          this.title.setTitle('Red Tetris: ' + room);
           return false;
         } else {
+          this.title.setTitle('Red Tetris: Error');
           return true;
         }
       })

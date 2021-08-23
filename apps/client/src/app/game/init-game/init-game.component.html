@@ -1,4 +1,16 @@
 <ng-container *ngIf='profile$ | async as profile'>
+  <ng-container *ngIf='!profile.inGame'>
+    <ng-container *ngIf='profile.role === role.ADMIN else wait'>
+      <red-tetris-help>
+        Hello {{profile.name}}! You are admin on this room. Start game when ready
+      </red-tetris-help>
+    </ng-container>
+    <ng-template #wait>
+      <red-tetris-help>
+        Hello {{profile.name}}! Please wait when admin start the game
+      </red-tetris-help>
+    </ng-template>
+  </ng-container>
   <mat-accordion multi *ngIf='playerList$ | async as players'>
     <mat-expansion-panel *ngFor="let player of players">
       <mat-expansion-panel-header>
@@ -8,18 +20,9 @@
       </mat-expansion-panel-header>
     </mat-expansion-panel>
   </mat-accordion>
-  <div *redTetrisSecure='role.ADMIN'>
-    <button mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
-  </div>
   <ng-container *ngIf='!profile.inGame'>
-    <ng-container *ngIf='profile.role === role.ADMIN else wait'>
-      <div>      hello admin start game when ready
-      </div>
-    </ng-container>
-    <ng-template #wait>
-      <div>
-        please wait game start
-      </div>
-    </ng-template>
+    <div *redTetrisSecure='role.ADMIN' class='start-button'>
+      <button mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
+    </div>
   </ng-container>
 </ng-container>

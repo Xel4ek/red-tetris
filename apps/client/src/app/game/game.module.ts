@@ -12,9 +12,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { InfoWidgetComponent } from './info-widget/info-widget.component';
 import { WebsocketModule } from '../core/services/websocket/websocket.module';
 import { environment } from '../../environments/environment';
+import { HelpComponent } from './help/help.component';
 
 @NgModule({
-  declarations: [MainComponent, InitGameComponent, InfoWidgetComponent],
+  declarations: [MainComponent, InitGameComponent, InfoWidgetComponent, HelpComponent],
   imports: [
     WebsocketModule.config({ url: environment.ws }),
     CommonModule,
