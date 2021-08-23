@@ -5,12 +5,14 @@ import {
   Location,
   LocationStrategy,
 } from '@angular/common';
-import { GameControlService } from '../../core/services/game-control/game-control.service';
+import {
+  GameControlService,
+  GameSettings,
+} from '../../core/services/game-control/game-control.service';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
-import { map, takeUntil, tap } from 'rxjs/operators';
+import { fromEvent, NEVER, Observable, Subject } from 'rxjs';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ProfileService } from '../../core/services/profile/profile.service';
-import { Role } from '../../core/interfaces/role';
 import { Profile } from '../../core/interfaces/profile';
 
 @Component({
@@ -23,56 +25,57 @@ import { Profile } from '../../core/interfaces/profile';
   ],
 })
 export class MainComponent implements OnDestroy {
-  room?: string;
-  player?: string;
   error: Observable<boolean>;
-  inGame = false;
   destroy$ = new Subject<void>();
   profile$: Observable<Profile>;
   playerList$: Observable<string[]>;
+  settings$: Observable<GameSettings>;
   constructor(
     private readonly location: Location,
     private readonly gameControlService: GameControlService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly profileService: ProfileService
   ) {
+    this.settings$ = gameControlService.settings();
     this.playerList$ = this.gameControlService.playersList();
     this.error = activatedRoute.fragment.pipe(
       map((fr) => {
         if (fr === null || !fr.endsWith(']')) {
           return true;
         }
-        [this.room, this.player] = fr
+        const [room, player] = fr
           .split(/\[|]|%5B|%5D/)
           .map((name) => name.replace('%20', ' ').trim());
-        if (this.player?.length && this.room?.length) {
-          gameControlService.register(this.room, this.player);
+        if (player?.length && room?.length) {
+          gameControlService.register(room, player);
           return false;
         } else {
           return true;
         }
       })
     );
-    this.profile$ = profileService.profile().pipe(
-      tap((profile) => {
-        this.inGame = profile.inGame;
-      })
-    );
+    this.profile$ = profileService.profile();
+    this.profile$
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(({ inGame }) =>
+          inGame ? fromEvent<KeyboardEvent>(document, 'keydown') : NEVER
+        ),
+        tap(({ code }) => this.handleKeyboardEvent(code))
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  @HostListener('document:keypress', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (this.inGame) {
-      if (event.code === 'KeyW') {
-        this.gameControlService.rotate('l');
-      }
-      if (event.code === 'KeyA') this.gameControlService.move('l');
-      if (event.code === 'KeyD') this.gameControlService.move('r');
-      if (event.code === 'KeyS') this.gameControlService.move('d');
+  handleKeyboardEvent(code: string) {
+    if (code === 'KeyW') {
+      this.gameControlService.rotate('l');
     }
+    if (code === 'KeyA') this.gameControlService.move('l');
+    if (code === 'KeyD') this.gameControlService.move('r');
+    if (code === 'KeyS') this.gameControlService.move('d');
   }
 }

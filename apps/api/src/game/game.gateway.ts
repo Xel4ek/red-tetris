@@ -21,13 +21,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly gameService: GameService) {}
 
   async handleConnection(client: WebSocket) {
-    // console.log(client);
-    // this.gameService
-    //   .terrain()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe((data) => {
-    //     client.send(JSON.stringify({ event: 'playerTerrain', data }));
-    //   });
+    client.send(JSON.stringify(this.gameService.gameSetup()));
   }
   @SubscribeMessage('game.register')
   registerGame(

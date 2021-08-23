@@ -1,19 +1,24 @@
-import { Subject, timer } from 'rxjs';
+import { BehaviorSubject, interval, Subject, timer } from 'rxjs';
 import { Piece, PieceGenerator } from '../../terrain/piece';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { takeUntil, tap } from 'rxjs/operators';
+import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
   private static empty = '#ffffff';
   private static border = '#300144';
   private static preview = '#6766669E';
+  private static baseScore = 100;
   private static previewRow = 6;
+  private static levelUpRows = 10;
   private static width = 12;
   private static height = 21;
   private destroy$ = new Subject<void>();
-  private updateTime = 1000;
+  private updateTime = new BehaviorSubject<number>(1000);
   private pieceColor = Terrain.randomColor();
   private pieceSerialNumber = 0;
+  private score: number;
+  private level: number;
+  private removedRows: number;
   terrain: string[];
   piece: Piece;
   position: number;
@@ -24,6 +29,9 @@ export class Terrain {
     this.terrain = Terrain.generateTerrain();
     this.piece = this.getNextPiece();
     this.position = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.score = 0;
+    this.level = 1;
+    this.removedRows = 0;
   }
   private resetPiece(): void {
     this.terrain = this.merge();
@@ -34,6 +42,14 @@ export class Terrain {
     if (!this.validate()) {
       this.eventEmitter.emit('terrain.overflow', this);
     }
+  }
+  public static settings() {
+    return {
+      width: Terrain.width,
+      height: Terrain.height,
+      previewRow: Terrain.previewRow,
+      border: Terrain.border,
+    };
   }
   private collapseRows(): void {
     const terrain = [];
@@ -53,6 +69,7 @@ export class Terrain {
       }
     }
     if (miss) {
+      this.updateScore(miss);
       this.terrain = [
         ...Array.from({ length: Terrain.width * miss }, (_, k) => {
           if (
@@ -68,7 +85,16 @@ export class Terrain {
       this.eventEmitter.emit('terrain.collapseRow', this, miss);
     }
   }
-
+  updateScore(miss: number) {
+    this.score += this.level * Terrain.baseScore * miss;
+    this.removedRows += miss;
+    const level = Math.trunc(this.removedRows / 10);
+    if (level !== this.level) {
+      this.level = Math.trunc(this.removedRows / 10);
+      const speed = this.updateTime.getValue();
+      this.updateTime.next(speed * 0.9);
+    }
+  }
   missRow(rows: number) {
     if (
       this.terrain
@@ -212,13 +238,11 @@ export class Terrain {
   }
   start() {
     this.share();
-    timer(0, this.updateTime)
+    this.updateTime
       .pipe(
+        switchMap((time) => interval(time)),
         takeUntil(this.destroy$),
-        tap(() => {
-          // console.log('event emitted');
-          this.move('d');
-        })
+        tap(() => this.move('d'))
       )
       .subscribe();
   }
@@ -229,5 +253,11 @@ export class Terrain {
   }
   share() {
     this.eventEmitter.emit('terrain.update', this);
+  }
+  status() {
+    return {
+      score: this.score,
+      level: this.level,
+    };
   }
 }

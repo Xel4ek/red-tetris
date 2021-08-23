@@ -21,12 +21,21 @@ export class GameService {
     const roomName = this.playerRepository.findByChannel(client).room;
     this.roomRepository.gameStart(roomName);
   }
-
+  gameSetup() {
+    return {
+      event: 'game.setup',
+      data: Terrain.settings(),
+    };
+  }
   registerGame(
     registerGameDto: RegisterGameDto,
     client: WebSocket
   ): WsMessage<ProfileDto> {
     const { room, player } = registerGameDto;
+    const existPlayer = this.playerRepository.findByChannel(client);
+    if (existPlayer) {
+      this.roomRepository.disconnect(client);
+    }
     let role = Role.PLAYER;
     const existRoom = this.roomRepository.findByName(room);
     if (!existRoom) {
@@ -37,15 +46,9 @@ export class GameService {
         role = Role.SPECTRAL;
       }
     }
-    const con = this.playerRepository.findByChannel(client);
-    if (con) {
-      con.name = player;
-      con.role = role;
-    } else {
-      this.playerRepository.push(
-        new PlayerDto(room, player, role, client, this.eventEmitter)
-      );
-    }
+    this.playerRepository.push(
+      new PlayerDto(room, player, role, client, this.eventEmitter)
+    );
     this.roomRepository.multicast(
       room,
       JSON.stringify({

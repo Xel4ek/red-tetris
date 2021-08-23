@@ -64,25 +64,34 @@ export class RoomRepositoryService {
   @OnEvent('terrain.update')
   terrainUpdate(terrain: Terrain) {
     const player = this.playerRepository.findByTerrain(terrain);
-    this.multicast(
-      player.room,
-      JSON.stringify({
-        event: 'terrain.' + player.name,
-        data: {
-          terrain: player.terrain,
-        },
-      })
-    );
+    if (player) {
+      this.multicast(
+        player.room,
+        JSON.stringify({
+          event: 'terrain.' + player.name,
+          data: {
+            terrain: player.terrain,
+            status: player.status,
+          },
+        })
+      );
+      player.send(
+        JSON.stringify({
+          event: 'game.info',
+          data: player._terrain.status(),
+        })
+      );
+    }
   }
   disconnect(channel: WebSocket) {
     const player = this.playerRepository.findByChannel(channel);
     if (!player) return;
     const room = this.findByName(player.room);
-    if (room.inGame) {
-      player.status = GameStatus.DISCONNECTED;
-    } else {
-      this.playerRepository.removeByChannel(channel);
-    }
+    // if (room.inGame) {
+    //   player.status = GameStatus.DISCONNECTED;
+    // } else {
+    this.playerRepository.removeByChannel(channel);
+    // }
     const players = this.playerRepository.findByRoom(room.name);
     if (players.length) {
       players[0].role = Role.ADMIN;

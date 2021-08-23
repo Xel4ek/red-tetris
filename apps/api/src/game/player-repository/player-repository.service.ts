@@ -39,30 +39,36 @@ export class PlayerRepositoryService {
   @OnEvent('terrain.overflow')
   terrainOverflow(terrain: Terrain) {
     const player = this.findByTerrain(terrain);
-    const players = this.findByRoom(player.room);
-    let otherPlayers = 0;
-    let winner: PlayerDto;
-    players.map((pl) => {
-      if (pl !== player && pl.status === GameStatus.ACTIVE) {
-        ++otherPlayers;
-        winner = pl;
+    if (player) {
+      const players = this.findByRoom(player.room);
+      let otherPlayers = 0;
+      let winner: PlayerDto;
+      players.map((pl) => {
+        if (pl !== player && pl.status === GameStatus.ACTIVE) {
+          ++otherPlayers;
+          winner = pl;
+        }
+      });
+      if (otherPlayers <= 1) {
+        winner = winner ?? player;
+        winner.winner();
+        this.eventEmitter.emit('game.stop', winner.room);
       }
-    });
-    if (otherPlayers <= 1) {
-      winner = winner ?? player;
-      winner.winner();
-      this.eventEmitter.emit('game.stop', winner.room);
+      player.loser();
+    } else {
+      terrain.stop();
     }
-    player.loser();
   }
   @OnEvent('pieceSerial.update', { async: true })
   pieceSerialUpdate(terrain: Terrain, lastThree: []) {
     const player = this.findByTerrain(terrain);
-    player.send(
-      JSON.stringify({
-        event: 'pieceSerial.update',
-        data: { terrain: lastThree },
-      })
-    );
+    if (player)
+      player.send(
+        JSON.stringify({
+          event: 'pieceSerial.update',
+          data: { terrain: lastThree },
+        })
+      );
+    else terrain.stop();
   }
 }

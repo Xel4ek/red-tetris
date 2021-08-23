@@ -4,10 +4,20 @@ import { map, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 
-interface GameStatus {
+export interface GameStatus {
   score: number;
   currentGame: string;
   pieceNumber: number;
+  level: number;
+}
+export interface GameSettings {
+  width: number;
+  height: number;
+  previewRow: number;
+  border: string;
+}
+export interface GameInfo {
+  score: number;
   level: number;
 }
 @Injectable({
@@ -17,14 +27,28 @@ export class GameControlService implements OnDestroy {
   private readonly room$ = new ReplaySubject<string>(1);
   private readonly player$ = new ReplaySubject<string>(1);
   private readonly playersList$ = new ReplaySubject<string[]>(1);
-  private readonly preview$ = new ReplaySubject<string[][]>(1);
+  private readonly preview$ = new ReplaySubject<string[]>(1);
   private readonly status$ = new ReplaySubject<GameStatus>(1);
+  private readonly settings$ = new ReplaySubject<GameSettings>(1);
+  private readonly info$ = new ReplaySubject<GameInfo>(1);
   private destroy$ = new Subject<void>();
   private readonly error$: Observable<boolean>;
   constructor(
     private readonly ws: WebsocketService,
     private readonly activatedRoute: ActivatedRoute
   ) {
+    ws.on<GameInfo>('game.info')
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data) => this.info$.next(data))
+      )
+      .subscribe();
+    ws.on<GameSettings>('game.setup')
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data) => this.settings$.next(data))
+      )
+      .subscribe();
     ws.on<string[]>('playersList')
       .pipe(
         takeUntil(this.destroy$),
@@ -50,7 +74,7 @@ export class GameControlService implements OnDestroy {
         }
       })
     );
-    ws.on<string[][]>('pieceSerial.update')
+    ws.on<string[]>('pieceSerial.update')
       .pipe(
         takeUntil(this.destroy$),
         tap((data) => this.preview$.next(data))
@@ -69,7 +93,6 @@ export class GameControlService implements OnDestroy {
     this.destroy$.complete();
   }
   register(room: string, player: string): void {
-    console.log('registered ', { room, player });
     this.ws.send('game.register', { room, player });
   }
   player(): Observable<string> {
@@ -98,5 +121,11 @@ export class GameControlService implements OnDestroy {
   }
   status(): Observable<GameStatus> {
     return this.status$.asObservable();
+  }
+  settings(): Observable<GameSettings> {
+    return this.settings$.asObservable();
+  }
+  info(): Observable<GameInfo> {
+    return this.info$.asObservable();
   }
 }

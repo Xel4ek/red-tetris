@@ -10,25 +10,30 @@
   <a href='/#ExapleRoom[ExamplePlayerName]'>Example</a>
 </ng-container>
 <ng-template #game>
+  <ng-container *ngIf='settings$ | async as settings'>
   <ng-container *ngIf='profile$ | async as profile'>
-    <div>{{profile.room}} {{player}}</div>
+    <div>{{profile.room}} {{profile.name}}</div>
     <red-tetris-init-game></red-tetris-init-game>
     {{profile | json}}
 <!--    <ng-container *ngIf='profile.inGame'>-->
       <div class='terrain-wrapper'>
         <ng-container *ngIf='playerList$ | async as playerList'>
           <div *ngFor='let playerTerrain of playerList' [ngStyle]="{'width': '100px'}">
-            <red-tetris-terrain *ngIf='playerTerrain !== player' [player]="'terrain.' + playerTerrain"
+            <red-tetris-terrain *ngIf='playerTerrain !== profile.name' [player]="'terrain.' + playerTerrain"
+                                [terrainCol]='settings.width'
             ></red-tetris-terrain>
           </div>
         </ng-container>
       </div>
     <div class='terrain-wrapper'>
       <div [ngStyle]="{'width': '400px'}">
-        <red-tetris-terrain [player]="'terrain.' + player"></red-tetris-terrain>
+        <red-tetris-terrain [player]="'terrain.' + profile.name" [terrainCol]='settings.width'></red-tetris-terrain>
       </div>
+      <div class='info-wrapper'>
+      <red-tetris-info-widget></red-tetris-info-widget>
       <div [ngStyle]="{'width': '100px'}">
-        <red-tetris-terrain [player]="'pieceSerial.update'" [terrainRow]='10' [terrainCol]='6'></red-tetris-terrain>
+        <red-tetris-terrain [player]="'pieceSerial.update'" [terrainCol]='settings.previewRow'></red-tetris-terrain>
+      </div>
       </div>
     </div>
 <!--    </ng-container>-->
@@ -41,5 +46,6 @@
     <!--        <red-tetris-terrain player='otherTerrain'></red-tetris-terrain>-->
     <!--      </div>-->
     <!--    </div>-->
+  </ng-container>
   </ng-container>
 </ng-template>

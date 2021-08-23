@@ -1,4 +1,30 @@
-.terrain {
-  display: grid;
-  gap: 1px;
+.terrain-helper {
+  position: relative;
+  .inactive {
+    opacity: .7;
+  }
+  .terrain {
+    display: grid;
+    gap: 1px;
+  }
+  .status {
+    user-select: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 50%) rotate(-24deg);
+    font-size: 7em;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .looser {
+    color: darkred;
+  }
+  .winner {
+    color: greenyellow;
+  }
+  .disconnect {
+    color: lightgray;
+    font-size: 6em;
+  }
 }

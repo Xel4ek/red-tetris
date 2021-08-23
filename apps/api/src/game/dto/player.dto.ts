@@ -9,7 +9,6 @@ export enum Role {
   ADMIN,
 }
 export enum GameStatus {
-  VACANT,
   DISCONNECTED,
   ACTIVE,
   LOSER,

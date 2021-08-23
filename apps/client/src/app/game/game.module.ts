@@ -9,9 +9,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { SecureModule } from '../core/directives/secure/secure.module';
 import { MatButtonModule } from '@angular/material/button';
+import { InfoWidgetComponent } from './info-widget/info-widget.component';
 
 @NgModule({
-  declarations: [MainComponent, InitGameComponent],
+  declarations: [MainComponent, InitGameComponent, InfoWidgetComponent],
   imports: [
     CommonModule,
     GameRoutingModule,
