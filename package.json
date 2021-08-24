@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others \"npm run start api\" \"npm run start client\"",
     "start:dev:db": "./apps/api/src/scripts/start-db.sh",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "nx run api:build:production && nx run client:build:production",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
