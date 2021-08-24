@@ -21,7 +21,9 @@ async function bootstrap() {
   app.useWebSocketAdapter(new WsAdapter(app));
   const port = process.env.PORT || 3333;
   const host = process.env.HOST || '0.0.0.0';
-  await app.listen(port, host);
+  await app.listen(port, host, (err, address) => {
+    console.log(err, address);
+  });
 }
 
 bootstrap();

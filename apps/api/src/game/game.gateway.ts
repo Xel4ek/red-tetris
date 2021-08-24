@@ -14,7 +14,7 @@ import { WsMessage } from './dto/message.dto';
 import { UseGuards } from '@nestjs/common';
 import { RoleGuard } from './guards/role.guard';
 
-@WebSocketGateway()
+@WebSocketGateway({ path: '/ws/' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;

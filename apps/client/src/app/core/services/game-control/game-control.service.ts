@@ -73,8 +73,6 @@ export class GameControlService implements OnDestroy {
           this.room$.next(room);
           return false;
         } else {
-          this.player$.next();
-          this.room$.next();
           return true;
         }
       })
