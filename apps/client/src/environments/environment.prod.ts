@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  ws: 'ws://' + window.location.host + '/ws/',
+  ws:
+    location.protocol.replace('http', 'ws') + '//' + location.hostname + '/ws/',
 };

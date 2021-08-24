@@ -4,7 +4,11 @@
 
 export const environment = {
   production: false,
-  ws: 'ws://localhost:3333/ws/',
+  ws:
+    location.protocol.replace('http', 'ws') +
+    '//' +
+    location.hostname +
+    ':3333/ws/',
 };
 
 /*
