@@ -20,7 +20,13 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.useWebSocketAdapter(new WsAdapter(app));
   const port = process.env.PORT || 3333;
-  await app.listen(port);
+  const host = process.env.HOST || '0.0.0.0';
+  await app.listen(port, host, (err, address) => {
+    console.log('Starting on: ', address);
+    if (err) {
+      console.error(err);
+    }
+  });
 }
 
 bootstrap();
