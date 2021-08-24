@@ -1,7 +1,7 @@
 {
   "npmScope": "red-tetris",
   "affected": {
-    "defaultBase": "master"
+    "defaultBase": "dev"
   },
   "implicitDependencies": {
     "package.json": {
