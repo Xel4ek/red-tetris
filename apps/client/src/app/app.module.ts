@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WebsocketModule } from './core/services/websocket/websocket.module';
 import { environment } from '../environments/environment';
-import { SunboxComponent } from './sunbox/sunbox/sunbox.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
@@ -15,7 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [AppComponent, SunboxComponent, WelcomeComponent],
+  declarations: [AppComponent, WelcomeComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

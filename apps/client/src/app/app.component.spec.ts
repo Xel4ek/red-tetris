@@ -1,35 +1,78 @@
-import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+// tslint:disable
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  Pipe,
+  PipeTransform,
+  Injectable,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NO_ERRORS_SCHEMA,
+  Directive,
+  Input,
+  Output,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
+import { Observable, of as observableOf, throwError } from 'rxjs';
+
+import { Component } from '@angular/core';
 import { AppComponent } from './app.component';
 
+@Directive({ selector: '[oneviewPermitted]' })
+class OneviewPermittedDirective {
+  @Input() oneviewPermitted: any;
+}
+
+@Pipe({ name: 'translate' })
+class TranslatePipe implements PipeTransform {
+  transform(value: any) {
+    return value;
+  }
+}
+
+@Pipe({ name: 'phoneNumber' })
+class PhoneNumberPipe implements PipeTransform {
+  transform(value: any) {
+    return value;
+  }
+}
+
+@Pipe({ name: 'safeHtml' })
+class SafeHtmlPipe implements PipeTransform {
+  transform(value: any) {
+    return value;
+  }
+}
+
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
+  let fixture: any;
+  let component: any;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule, ReactiveFormsModule],
       declarations: [
-        AppComponent
+        AppComponent,
+        TranslatePipe,
+        PhoneNumberPipe,
+        SafeHtmlPipe,
+        OneviewPermittedDirective,
       ],
-    }).compileComponents();
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
+      providers: [],
+    })
+      .overrideComponent(AppComponent, {})
+      .compileComponents();
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.debugElement.componentInstance;
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  afterEach(() => {
+    component.ngOnDestroy = function () {};
+    fixture.destroy();
   });
 
-  it(`should have as title 'red-tetris-ui'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('red-tetris-ui');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('red-tetris-ui app is running!');
+  it('should run #constructor()', async () => {
+    expect(component).toBeTruthy();
   });
 });
