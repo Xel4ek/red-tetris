@@ -1,1 +1,2 @@
-web: npm run affected:build
+worker: npm run affected:build
+web: node dist/apps/api/main.js
