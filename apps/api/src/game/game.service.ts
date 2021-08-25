@@ -11,6 +11,9 @@ import { Terrain } from './terrain/terrain';
 import { map, Observable } from 'rxjs';
 import { LeaderboardsDto } from './dto/leaderboards.dto';
 import { LeaderboardsRepositoryService } from './leaderboards-repository/leaderboards-repository.service';
+import { InjectRepository } from "@nestjs/typeorm";
+import { ScoreEntity } from "./entities/score.entity";
+import { Repository } from "typeorm";
 import { ValidateDto, ValidateResponseDto } from './dto/validate.dto';
 import { ErrorDto } from './dto/error.dto';
 
@@ -20,7 +23,8 @@ export class GameService {
     private readonly eventEmitter: EventEmitter2,
     private readonly roomRepository: RoomRepositoryService,
     private readonly playerRepository: PlayerRepositoryService,
-    private readonly leaderboardsRepository: LeaderboardsRepositoryService
+    private readonly leaderboardsRepository: LeaderboardsRepositoryService,
+    @InjectRepository(ScoreEntity) private scoreRepository: Repository<ScoreEntity>,
   ) {}
 
   startGame(client: WebSocket) {
@@ -70,7 +74,7 @@ export class GameService {
       }
     }
     this.playerRepository.push(
-      new PlayerDto(room, player, role, client, this.eventEmitter)
+      new PlayerDto(room, player, role, client, this.eventEmitter, this.scoreRepository)
     );
     this.roomRepository.multicast(
       room,

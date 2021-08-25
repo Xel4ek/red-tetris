@@ -1,6 +1,9 @@
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Terrain } from '../terrain/terrain';
 import { PieceGenerator } from '../../terrain/piece';
+import { InjectRepository } from "@nestjs/typeorm";
+import { ScoreEntity } from "../entities/score.entity";
+import { Repository } from "typeorm";
 
 export enum Role {
   ANTONYMOUS,
@@ -29,7 +32,8 @@ export class PlayerDto {
     name,
     role,
     channel,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
+    @InjectRepository(ScoreEntity) private scoreRepository: Repository<ScoreEntity>
   ) {
     this.name = name;
     this.channels = [channel];
@@ -41,8 +45,7 @@ export class PlayerDto {
   }
   gameStart(pieceGenerator: PieceGenerator): void {
     this.status = GameStatus.ACTIVE;
-    this._terrain = new Terrain(this.eventEmitter, pieceGenerator);
-
+    this._terrain = new Terrain(this.eventEmitter, pieceGenerator, this.room, this.name, this.scoreRepository);
     this._terrain.start();
 
     // console.log(this.eventEmitter);
