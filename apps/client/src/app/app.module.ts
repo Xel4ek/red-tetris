@@ -9,9 +9,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
 import { SecureModule } from './core/directives/secure/secure.module';
-import { WelcomeComponent } from './welcome/welcome.component';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
+import { WelcomeComponent } from './common/welcome/welcome.component';
 
 @NgModule({
   declarations: [AppComponent, WelcomeComponent],

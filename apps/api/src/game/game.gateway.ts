@@ -13,6 +13,8 @@ import { RegisterGameDto } from './dto/register-game.dto';
 import { WsMessage } from './dto/message.dto';
 import { UseGuards } from '@nestjs/common';
 import { RoleGuard } from './guards/role.guard';
+import { LeaderboardsDto } from './dto/leaderboards.dto';
+import { Observable } from 'rxjs';
 
 @WebSocketGateway({ path: '/ws/' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -49,6 +51,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: WebSocket
   ) {
     this.gameService.pieceMove(client, direction);
+  }
+  @SubscribeMessage('leaderboards')
+  leaderboards(): Observable<WsMessage<LeaderboardsDto[]>> {
+    return this.gameService.leaderboards();
   }
   handleDisconnect(client: WebSocket): void {
     this.gameService.disconnect(client);

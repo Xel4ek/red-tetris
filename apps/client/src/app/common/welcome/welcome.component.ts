@@ -8,7 +8,6 @@ import { Title } from '@angular/platform-browser';
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.css'],
 })
-// interface RegisterForm
 export class WelcomeComponent {
   registerFormGroup: FormGroup;
   constructor(

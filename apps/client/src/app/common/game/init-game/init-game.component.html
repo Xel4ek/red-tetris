@@ -20,9 +20,9 @@
       </mat-expansion-panel-header>
     </mat-expansion-panel>
   </mat-accordion>
-  <ng-container *ngIf='!profile.inGame'>
-    <div *redTetrisSecure='role.ADMIN' class='start-button'>
-      <button mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
-    </div>
-  </ng-container>
+  <div class='start-button' *ngIf='!profile.inGame'>
+    <button routerLink='/' mat-raised-button color="primary">Quit</button>
+    <button routerLink='/leaderboards' mat-raised-button color="primary">Leaderboards</button>
+    <button *redTetrisSecure='role.ADMIN' mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
+  </div>
 </ng-container>

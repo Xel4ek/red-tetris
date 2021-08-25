@@ -4,16 +4,17 @@ import {
   Location,
   LocationStrategy,
 } from '@angular/common';
-import {
-  GameControlService,
-  GameSettings,
-} from '../../core/services/game-control/game-control.service';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromEvent, NEVER, Observable, Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { ProfileService } from '../../core/services/profile/profile.service';
-import { Profile } from '../../core/interfaces/profile';
 import { Title } from '@angular/platform-browser';
+import {
+  GameControlService,
+  GameSettings,
+} from '../../../core/services/game-control/game-control.service';
+import { Profile } from '../../../core/interfaces/profile';
+import { ProfileService } from '../../../core/services/profile/profile.service';
 
 @Component({
   selector: 'red-tetris-main',

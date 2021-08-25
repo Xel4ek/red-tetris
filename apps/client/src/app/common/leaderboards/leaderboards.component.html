@@ -1,0 +1,14 @@
+<div class='about-title'>
+  Leaderboards
+</div>
+<div class='leaderboards'>
+  <div class='leaderboards-head'>Name</div>
+  <div class='leaderboards-head'>PvP</div>
+  <div class='leaderboards-head'>Score</div>
+  <ng-container *ngFor='let entry of leaderboards$ | async'>
+    <div  *ngFor='let item of entry | keyvalue' [title]='item.value'>{{item.value | truncate: 20}}</div>
+  </ng-container>
+</div>
+<div class='start-button' [ngStyle]="{'justify-content': 'flex-end'}">
+  <button mat-raised-button color='primary' redTetrisBackButton>Back</button>
+</div>

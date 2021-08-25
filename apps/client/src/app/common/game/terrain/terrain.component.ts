@@ -4,7 +4,7 @@ import {
   ElementRef,
   HostBinding,
   Input,
-  OnInit,
+  Self,
   ViewChild,
 } from '@angular/core';
 import { GameStatus, TerrainService } from './terrain.service';
@@ -20,18 +20,18 @@ import { Observable, timer } from 'rxjs';
       .terrain {
         grid: 1fr / repeat(var(--terrainCol), 1fr);
       }
+
       .status {
         font-size: var(--size);
       }
     `,
   ],
 })
-export class TerrainComponent implements OnInit, AfterViewInit {
+export class TerrainComponent implements AfterViewInit {
   terrain$!: Observable<string[]>;
   status$: Observable<GameStatus>;
   gameStatus = GameStatus;
   @Input() title?: string;
-  @Input() player!: string;
   @HostBinding('style.--terrainCol')
   @Input()
   terrainCol!: number;
@@ -40,17 +40,17 @@ export class TerrainComponent implements OnInit, AfterViewInit {
   @HostBinding('style.--size')
   private size!: string;
 
-  constructor(private readonly terrainService: TerrainService) {
+  constructor(@Self() private readonly terrainService: TerrainService) {
     this.status$ = terrainService.status();
+  }
+
+  @Input() set player(name: string) {
+    this.terrainService.subscribe(name);
+    this.terrain$ = this.terrainService.terrain();
   }
 
   trackFn(index: number): number {
     return index;
-  }
-
-  ngOnInit(): void {
-    this.terrainService.subscribe(this.player);
-    this.terrain$ = this.terrainService.terrain();
   }
 
   drag() {

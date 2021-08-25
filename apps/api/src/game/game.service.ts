@@ -8,25 +8,31 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { RoomRepositoryService } from './room-repository/room-repository.service';
 import { PlayerRepositoryService } from './player-repository/player-repository.service';
 import { Terrain } from './terrain/terrain';
+import { map, Observable } from 'rxjs';
+import { LeaderboardsDto } from './dto/leaderboards.dto';
+import { LeaderboardsRepositoryService } from './leaderboards-repository/leaderboards-repository.service';
 
 @Injectable()
 export class GameService {
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly roomRepository: RoomRepositoryService,
-    private readonly playerRepository: PlayerRepositoryService
+    private readonly playerRepository: PlayerRepositoryService,
+    private readonly leaderboardsRepository: LeaderboardsRepositoryService
   ) {}
 
   startGame(client: WebSocket) {
     const roomName = this.playerRepository.findByChannel(client).room;
     this.roomRepository.gameStart(roomName);
   }
+
   gameSetup() {
     return {
       event: 'game.setup',
       data: Terrain.settings(),
     };
   }
+
   registerGame(
     registerGameDto: RegisterGameDto,
     client: WebSocket
@@ -66,6 +72,7 @@ export class GameService {
       },
     };
   }
+
   disconnect(client: WebSocket) {
     this.roomRepository.disconnect(client);
   }
@@ -74,6 +81,7 @@ export class GameService {
     const player = this.playerRepository.findByChannel(client);
     player._terrain.rotate(direction);
   }
+
   pieceMove(client: WebSocket, direction: 'l' | 'r' | 'd'): void {
     const player = this.playerRepository.findByChannel(client);
     player._terrain.move(direction);
@@ -82,5 +90,14 @@ export class GameService {
   @OnEvent('game.stop')
   gameStop(player: PlayerDto) {
     console.log('stop game in room, winner: ', player);
+  }
+
+  leaderboards(): Observable<WsMessage<LeaderboardsDto[]>> {
+    return this.leaderboardsRepository.getTop().pipe(
+      map((data) => ({
+        event: 'leaderboards',
+        data,
+      }))
+    );
   }
 }

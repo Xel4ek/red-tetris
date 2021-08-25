@@ -27,8 +27,9 @@
         Name is <strong>required</strong>
       </mat-error>
     </mat-form-field>
-    <div class='start-button' [ngStyle]="{'justify-content': 'space-between'}">
+    <div class='start-button'>
       <button  type='button' mat-raised-button color="primary" routerLink='/about'>About Us</button>
+      <button  type='button' mat-raised-button color="primary" routerLink='/leaderboards'>Leaderboards</button>
       <button  mat-raised-button color="primary" [disabled]='registerFormGroup.invalid'>Create lobby</button>
     </div>
   </form>

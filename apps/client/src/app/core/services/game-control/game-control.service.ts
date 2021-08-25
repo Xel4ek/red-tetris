@@ -34,7 +34,7 @@ export class GameControlService implements OnDestroy {
   private readonly preview$ = new ReplaySubject<string[]>(1);
   private readonly status$ = new ReplaySubject<GameStatus>(1);
   private readonly settings$ = new ReplaySubject<GameSettings>(1);
-  private readonly info$ = new ReplaySubject<GameInfo>(1);
+  private readonly info$ = new Subject<GameInfo>();
   private destroy$ = new Subject<void>();
   private readonly error$: Observable<boolean>;
 

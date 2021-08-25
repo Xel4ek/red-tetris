@@ -13,6 +13,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .start-button {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 1rem 3rem 2rem;
+}
+.about-title {
+  font-size: 4rem;
+  font-weight: 500;
+  font-style: italic;
+  text-align: center;
+  text-shadow: 2px 2px 2px rgb(0 0 0 / 50%);
+  background: linear-gradient(
+      176deg
+    , #a20d0d, #ba1313 44%, #3cb52e 57%, #ccefb1);
+  padding: 2rem 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Location } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -8,13 +7,7 @@ import { Title } from '@angular/platform-browser';
   styleUrls: ['./about.component.scss'],
 })
 export class AboutComponent {
-  constructor(
-    private readonly location: Location,
-    private readonly title: Title
-  ) {
+  constructor(private readonly title: Title) {
     this.title.setTitle('About');
-  }
-  back() {
-    this.location.back();
   }
 }

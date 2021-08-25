@@ -1,0 +1,24 @@
+.title{
+  padding: 2rem 0;
+  text-align: center;
+}
+.leaderboards {
+  display: grid;
+  max-width: 600px;
+  margin: 0 auto;
+  background: silver;
+  grid: repeat(11, 2rem) / minmax(300px, 2fr) 1fr 1fr;
+  gap: 1px;
+  & > div {
+    overflow: hidden;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    background: white;
+  }
+
+  &-head {
+    font-weight: bold;
+  }
+}
