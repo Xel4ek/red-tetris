@@ -11,6 +11,8 @@ import { Terrain } from './terrain/terrain';
 import { map, Observable } from 'rxjs';
 import { LeaderboardsDto } from './dto/leaderboards.dto';
 import { LeaderboardsRepositoryService } from './leaderboards-repository/leaderboards-repository.service';
+import { ValidateDto, ValidateResponseDto } from './dto/validate.dto';
+import { ErrorDto } from './dto/error.dto';
 
 @Injectable()
 export class GameService {
@@ -36,7 +38,22 @@ export class GameService {
   registerGame(
     registerGameDto: RegisterGameDto,
     client: WebSocket
-  ): WsMessage<ProfileDto> {
+  ): WsMessage<ProfileDto | ErrorDto> {
+    if (
+      !this.validate({
+        lobby: registerGameDto.room,
+        name: registerGameDto.player,
+      }).name
+    ) {
+      return {
+        event: 'error',
+        data: {
+          message: 'Name already used in this room please choose other',
+          lobby: registerGameDto.room,
+          name: registerGameDto.player,
+        },
+      };
+    }
     const { room, player } = registerGameDto;
     const existPlayer = this.playerRepository.findByChannel(client);
     if (existPlayer) {
@@ -99,5 +116,12 @@ export class GameService {
         data,
       }))
     );
+  }
+  validate(validateDto: ValidateDto): ValidateResponseDto {
+    const player = this.playerRepository.findByName(validateDto.name);
+    return {
+      lobby: !!this.roomRepository.findByName(validateDto.lobby),
+      name: player?.room !== validateDto.lobby,
+    };
   }
 }

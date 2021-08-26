@@ -1,4 +1,4 @@
-<ng-container *ngIf='profile$ | async as profile'>
+<div *ngIf='profile$ | async as profile'>
   <ng-container *ngIf='!profile.inGame'>
     <ng-container *ngIf='profile.role === role.ADMIN else wait'>
       <red-tetris-help>
@@ -20,9 +20,13 @@
       </mat-expansion-panel-header>
     </mat-expansion-panel>
   </mat-accordion>
-  <div class='start-button' *ngIf='!profile.inGame'>
+  <ng-container *ngIf='!profile.inGame'>
+  <div class='start-button' *redTetrisSecure='role.ADMIN' [ngStyle]="{'justify-content': 'flex-end'}">
+    <button  mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
+  </div>
+  <div class='start-button'>
     <button routerLink='/' mat-raised-button color="primary">Quit</button>
     <button routerLink='/leaderboards' mat-raised-button color="primary">Leaderboards</button>
-    <button *redTetrisSecure='role.ADMIN' mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
   </div>
-</ng-container>
+  </ng-container>
+</div>

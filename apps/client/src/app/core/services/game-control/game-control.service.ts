@@ -1,8 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { WebsocketService } from '../websocket/websocket.service';
-import { map, takeUntil, tap } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
+import { takeUntil, tap } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 export interface GameStatus {
   score: number;
@@ -24,6 +25,22 @@ export interface GameInfo {
   piece: number;
 }
 
+export interface ValidateDto {
+  lobby: boolean;
+  name: boolean;
+}
+
+export interface ValidateQueryDto {
+  lobby: string;
+  name: string;
+}
+
+export interface ErrorMessage {
+  message: string;
+  lobby: string;
+  name: string;
+}
+
 @Injectable({
   providedIn: 'any',
 })
@@ -35,13 +52,23 @@ export class GameControlService implements OnDestroy {
   private readonly status$ = new ReplaySubject<GameStatus>(1);
   private readonly settings$ = new ReplaySubject<GameSettings>(1);
   private readonly info$ = new Subject<GameInfo>();
+  private readonly validation$ = new ReplaySubject<ValidateDto>(1);
   private destroy$ = new Subject<void>();
-  private readonly error$: Observable<boolean>;
 
   constructor(
     private readonly ws: WebsocketService,
-    private readonly activatedRoute: ActivatedRoute
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly httpClient: HttpClient,
+    private router: Router
   ) {
+    ws.on<ErrorMessage>('error')
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data) => {
+          this.router.navigate(['/welcome'], { state: data });
+        })
+      )
+      .subscribe();
     ws.on<GameInfo>('game.info')
       .pipe(
         takeUntil(this.destroy$),
@@ -60,23 +87,6 @@ export class GameControlService implements OnDestroy {
         tap((data) => this.playersList$.next(data))
       )
       .subscribe();
-    this.error$ = activatedRoute.fragment.pipe(
-      map((fr) => {
-        if (fr === null || !fr.endsWith(']')) {
-          return true;
-        }
-        const [room, player] = fr
-          .split(/\[|]|%5B|%5D/)
-          .map((name) => name.replace('%20', ' ').trim());
-        if (player?.length && room?.length) {
-          this.player$.next(player);
-          this.room$.next(room);
-          return false;
-        } else {
-          return true;
-        }
-      })
-    );
     ws.on<string[]>('pieceSerial.update')
       .pipe(
         takeUntil(this.destroy$),
@@ -89,11 +99,22 @@ export class GameControlService implements OnDestroy {
         tap((data) => this.status$.next(data))
       )
       .subscribe();
+    this.ws
+      .on<ValidateDto>('game.register.validate')
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data) => this.validation$.next(data))
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  validate(data: ValidateQueryDto): void {
+    this.ws.send('game.register.validate', data);
   }
 
   register(room: string, player: string): void {
@@ -106,10 +127,6 @@ export class GameControlService implements OnDestroy {
 
   room(): Observable<string> {
     return this.room$.asObservable();
-  }
-
-  error(): Observable<boolean> {
-    return this.error$;
   }
 
   playersList(): Observable<string[]> {
@@ -142,5 +159,13 @@ export class GameControlService implements OnDestroy {
 
   info(): Observable<GameInfo> {
     return this.info$.asObservable();
+  }
+
+  validation(): Observable<ValidateDto> {
+    return this.validation$.asObservable();
+  }
+
+  httpValidation(data: ValidateQueryDto): Observable<ValidateDto> {
+    return this.httpClient.post<ValidateDto>('/api/registration', data);
   }
 }

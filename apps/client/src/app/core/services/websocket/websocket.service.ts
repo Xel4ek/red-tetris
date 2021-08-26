@@ -27,19 +27,19 @@ import { config } from './websocket.config';
 })
 export class WebsocketService implements IWebsocketService, OnDestroy {
   public status: Observable<boolean>;
-  private readonly config: WebSocketSubjectConfig<IWsMessage<any>>;
+  private readonly config: WebSocketSubjectConfig<IWsMessage<unknown>>;
   private websocketSub: SubscriptionLike;
   private statusSub: SubscriptionLike;
   private reconnection$: Observable<number> | null = null;
-  private websocket$: WebSocketSubject<IWsMessage<any>> | null = null;
+  private websocket$: WebSocketSubject<IWsMessage<unknown>> | null = null;
   private connection$?: Observer<boolean>;
-  private wsMessages$: Subject<IWsMessage<any>>;
+  private wsMessages$: Subject<IWsMessage<unknown>>;
   private reconnectInterval: number;
   private readonly reconnectAttempts: number;
   private isConnected = false;
 
   constructor(@Inject(config) private wsConfig: WebSocketConfig) {
-    this.wsMessages$ = new Subject<IWsMessage<any>>();
+    this.wsMessages$ = new Subject<IWsMessage<unknown>>();
 
     this.reconnectInterval = wsConfig.reconnectInterval || 5000; // pause between connections
     this.reconnectAttempts = wsConfig.reconnectAttempts || 10; // number of connection attempts
@@ -49,18 +49,13 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
       closeObserver: {
         next: () => {
           this.websocket$ = null;
-          console.log('WebSocket disconnected');
           this.connection$?.next(false);
         },
       },
       openObserver: {
-        next: () => {
-          console.log('WebSocket connected');
-          this.connection$?.next(true);
-        },
+        next: () => this.connection$?.next(true),
       },
     };
-    console.log(this.config);
     // connection status
     this.status = new Observable<boolean>((observer) => {
       this.connection$ = observer;
@@ -97,16 +92,15 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
 
   public on<T>(event: string): Observable<T> {
     return this.wsMessages$.pipe(
-      filter((message: IWsMessage<T>) => message.event === event),
-      map((message: IWsMessage<T>) => message.data)
+      filter((message: IWsMessage<unknown>) => message.event === event),
+      map((message: IWsMessage<unknown>) => message.data as T)
     );
   }
 
   /*
    * on message to server
    * */
-  public send(event: string, data: any = {}): void {
-    console.log(event, this.isConnected, data);
+  public send(event: string, data: unknown = {}): void {
     if (event && this.isConnected) {
       this.websocket$?.next({ event, data });
     } else {
@@ -124,18 +118,17 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
   private connect(): void {
     this.websocket$ = new WebSocketSubject(this.config);
 
-    this.websocket$.subscribe(
-      (message) => {
+    this.websocket$.subscribe({
+      next: (message) => {
         // console.log(message);
         this.wsMessages$.next(message);
       },
-      () => {
+      error: () => {
         if (!this.websocket$) {
-          console.error('Connect error');
           this.reconnect();
         }
-      }
-    );
+      },
+    });
   }
 
   /*

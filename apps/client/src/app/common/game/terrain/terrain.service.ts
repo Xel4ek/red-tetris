@@ -18,7 +18,6 @@ export class TerrainService {
   private status$ = new ReplaySubject<GameStatus>(1);
   constructor(private readonly websocketService: WebsocketService) {}
   subscribe(playerName: string): void {
-    console.log(playerName);
     this.terrain$ = this.websocketService
       .on<{ terrain: string[]; status: GameStatus }>(playerName)
       .pipe(

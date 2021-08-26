@@ -15,6 +15,9 @@ import { UseGuards } from '@nestjs/common';
 import { RoleGuard } from './guards/role.guard';
 import { LeaderboardsDto } from './dto/leaderboards.dto';
 import { Observable } from 'rxjs';
+import { ValidateDto, ValidateResponseDto } from './dto/validate.dto';
+import { ProfileDto } from './dto/profile.dto';
+import { ErrorDto } from './dto/error.dto';
 
 @WebSocketGateway({ path: '/ws/' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -25,11 +28,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: WebSocket) {
     client.send(JSON.stringify(this.gameService.gameSetup()));
   }
+  @SubscribeMessage('game.register.validate')
+  gameRegisterValidate(
+    @MessageBody() validateDto: ValidateDto
+  ): WsMessage<ValidateResponseDto> {
+    return {
+      event: 'game.register.validate',
+      data: this.gameService.validate(validateDto),
+    };
+  }
   @SubscribeMessage('game.register')
   registerGame(
     @MessageBody() registerGameDto: RegisterGameDto,
     @ConnectedSocket() client: WebSocket
-  ): WsMessage<{ role: number; inGame: boolean }> {
+  ): WsMessage<ProfileDto | ErrorDto> {
     return this.gameService.registerGame(registerGameDto, client);
   }
   @UseGuards(RoleGuard)

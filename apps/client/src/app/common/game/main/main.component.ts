@@ -30,7 +30,6 @@ export class MainComponent implements OnDestroy {
   profile$: Observable<Profile>;
   playerList$: Observable<string[]>;
   settings$: Observable<GameSettings>;
-
   constructor(
     private readonly title: Title,
     private readonly location: Location,
@@ -48,12 +47,13 @@ export class MainComponent implements OnDestroy {
             this.title.setTitle('Red Tetris: Error');
             return true;
           }
-          const [room, player] = fr
-            .split(/\[|]|%5B|%5D/)
-            .map((name) => name.replace('%20', ' ').trim());
-          if (player?.length && room?.length) {
-            gameControlService.register(room, player);
-            this.title.setTitle('Red Tetris: ' + room);
+          const index = fr.search(/\[|%5B/);
+          if (index <= 0) return true;
+          const lobby = fr.slice(0, index);
+          const name = fr.slice(index + 1, -1);
+          if (name?.length && lobby?.length) {
+            gameControlService.register(lobby, name);
+            this.title.setTitle('Red Tetris: ' + lobby);
             return false;
           } else {
             this.title.setTitle('Red Tetris: Error');
