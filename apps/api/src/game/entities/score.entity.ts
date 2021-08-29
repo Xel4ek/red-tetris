@@ -1,16 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class ScoreEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  room: string;
+  @CreateDateColumn()
+  created_at;
 
-  @Column()
+  @UpdateDateColumn()
+  updated_at;
+
+  @PrimaryColumn()
   player: string;
 
-  @Column({ default: true })
-  score: boolean;
+  @Column({ type: "bigint", default: 0 })
+  scoreSingle: bigint;
+
+  @Column({ type: "bigint", default: 0 })
+  scoreMulti: bigint;
 }

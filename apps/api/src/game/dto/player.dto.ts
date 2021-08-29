@@ -23,6 +23,9 @@ export class PlayerDto {
   room: string;
   role: Role;
   status: GameStatus;
+  scoreSingle: number;
+  scoreMulti: number;
+
   get terrain(): string[] {
     return this._terrain.merge();
   }
@@ -33,7 +36,6 @@ export class PlayerDto {
     role,
     channel,
     private readonly eventEmitter: EventEmitter2,
-    @InjectRepository(ScoreEntity) private scoreRepository: Repository<ScoreEntity>
   ) {
     this.name = name;
     this.channels = [channel];
@@ -41,11 +43,11 @@ export class PlayerDto {
     this.role = role;
   }
   gameStop(): void {
-    console.log('game stop ', this.name);
+    console.log('game stop ', this);
   }
   gameStart(pieceGenerator: PieceGenerator): void {
     this.status = GameStatus.ACTIVE;
-    this._terrain = new Terrain(this.eventEmitter, pieceGenerator, this.room, this.name, this.scoreRepository);
+    this._terrain = new Terrain(this.eventEmitter, pieceGenerator);
     this._terrain.start();
 
     // console.log(this.eventEmitter);

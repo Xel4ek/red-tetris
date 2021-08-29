@@ -81,10 +81,10 @@ export class GameControlService implements OnDestroy {
         tap((data) => this.settings$.next(data))
       )
       .subscribe();
-    ws.on<string[]>('playersList')
+    ws.on<{name: string}[]>('playersList')
       .pipe(
         takeUntil(this.destroy$),
-        tap((data) => this.playersList$.next(data))
+        tap((data) => this.playersList$.next(data.map(entry => entry.name)))
       )
       .subscribe();
     ws.on<string[]>('pieceSerial.update')

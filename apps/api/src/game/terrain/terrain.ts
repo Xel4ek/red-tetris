@@ -2,9 +2,6 @@ import { BehaviorSubject, interval, Subject } from 'rxjs';
 import { Piece, PieceGenerator } from '../../terrain/piece';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ScoreEntity } from "../entities/score.entity";
 
 export class Terrain {
   private static empty = '#ffffff';
@@ -23,7 +20,7 @@ export class Terrain {
   private updateTime = new BehaviorSubject<number>(1000);
   private pieceColor = Terrain.randomColor();
   private pieceSerialNumber = 0;
-  private score: number;
+  score: number;
   private level: number;
   private removedRows: number;
   private inGame = false;
@@ -32,9 +29,6 @@ export class Terrain {
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly pieceGenerator: PieceGenerator,
-    private readonly room: string,
-    private readonly player: string,
-    @InjectRepository(ScoreEntity) private scoreRepository: Repository<ScoreEntity>
   ) {
     this.terrain = Terrain.generateTerrain();
     this.piece = this.getNextPiece();
@@ -74,14 +68,16 @@ export class Terrain {
   }
 
   updateScore(miss: number) {
+    console.log(this.score, miss, this.level);
     this.score += this.level * Terrain.baseScore * miss;
-    this.scoreRepository.update({room: this.room, player: this.player}, {})
     this.removedRows += miss;
     const level = Math.trunc(this.removedRows / Terrain.levelUpRows);
     if (level !== this.level) {
       this.level = level;
       this.updateTime.next(this.updateTime.getValue() * 0.9);
     }
+    this.eventEmitter.emit('score.update', this);
+    console.log(this.score);
   }
 
   missRow(rows: number) {
