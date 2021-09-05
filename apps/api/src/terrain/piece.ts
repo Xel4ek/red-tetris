@@ -51,6 +51,7 @@ export class Piece {
     }
     this.piece = piece;
   }
+
   show(): boolean[] {
     return this.piece;
   }
