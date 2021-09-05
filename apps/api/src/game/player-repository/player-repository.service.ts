@@ -50,9 +50,7 @@ export class PlayerRepositoryService {
         }
       });
       if (otherPlayers <= 1) {
-        if (winner === undefined || winner === null) {
-          winner = player;
-        }
+        winner = winner ?? player;
         winner.winner();
         this.eventEmitter.emit('game.stop', winner.room);
       }
