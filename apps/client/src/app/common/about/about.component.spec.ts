@@ -77,11 +77,4 @@ describe('AboutComponent', () => {
   it('should run #constructor()', async () => {
     expect(component).toBeTruthy();
   });
-
-  it('should run #back()', async () => {
-    component.location = component.location || {};
-    component.location.back = jest.fn();
-    component.back();
-    // expect(component.location.back).toHaveBeenCalled();
-  });
 });

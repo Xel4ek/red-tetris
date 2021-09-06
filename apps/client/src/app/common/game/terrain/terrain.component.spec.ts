@@ -92,15 +92,6 @@ describe('TerrainComponent', () => {
     component.trackFn({});
   });
 
-  it('should run #ngOnInit()', async () => {
-    component.terrainService = component.terrainService || {};
-    component.terrainService.subscribe = jest.fn();
-    component.terrainService.terrain = jest.fn();
-    component.ngOnInit();
-    // expect(component.terrainService.subscribe).toHaveBeenCalled();
-    // expect(component.terrainService.terrain).toHaveBeenCalled();
-  });
-
   it('should run #drag()', async () => {
     component.drag();
   });

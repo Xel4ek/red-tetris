@@ -18,7 +18,7 @@ export class SecureDirective implements OnDestroy {
   private subscription?: Subscription;
   constructor(
     private readonly element: ElementRef,
-    private readonly templateRef: TemplateRef<any>,
+    private readonly templateRef: TemplateRef<ElementRef>,
     private readonly viewContainer: ViewContainerRef,
     private readonly roleService: ProfileService
   ) {}
