@@ -25,10 +25,9 @@ export class Terrain {
   private removedRows: number;
   private inGame = false;
 
-
   constructor(
     private readonly eventEmitter: EventEmitter2,
-    private readonly pieceGenerator: PieceGenerator,
+    private readonly pieceGenerator: PieceGenerator
   ) {
     this.terrain = Terrain.generateTerrain();
     this.piece = this.getNextPiece();
@@ -68,16 +67,14 @@ export class Terrain {
   }
 
   updateScore(miss: number) {
-    console.log(this.score, miss, this.level);
     this.score += this.level * Terrain.baseScore * miss;
     this.removedRows += miss;
-    const level = Math.trunc(this.removedRows / Terrain.levelUpRows);
+    const level = Math.trunc(this.removedRows / Terrain.levelUpRows) + 1;
     if (level !== this.level) {
       this.level = level;
       this.updateTime.next(this.updateTime.getValue() * 0.9);
     }
     this.eventEmitter.emit('score.update', this);
-    console.log(this.score);
   }
 
   missRow(rows: number) {
