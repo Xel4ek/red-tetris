@@ -27,7 +27,7 @@ export class PlayerDto {
   scoreMulti: number;
 
   get terrain(): string[] {
-    return this._terrain.merge();
+    return this.removeBorder(this._terrain.merge());
   }
   _terrain: Terrain;
   constructor(
@@ -42,6 +42,11 @@ export class PlayerDto {
     this.room = room;
     this.role = role;
   }
+
+  removeBorder(terrain: string[]): string[] {
+    return terrain.filter(item => item != Terrain.border);
+  }
+
   gameStop(): void {
     console.log('game stop ', this);
   }

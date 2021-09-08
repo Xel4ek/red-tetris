@@ -5,7 +5,7 @@ import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
   private static empty = '#ffffff';
-  private static border = '#300144';
+  static border = '#300144';
   private static preview = '#6766669E';
   private static baseScore = 100;
   private static previewRow = 6;
