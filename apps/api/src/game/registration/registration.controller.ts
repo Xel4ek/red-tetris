@@ -5,10 +5,7 @@ import { GameService } from '../game.service';
 @Controller('registration/')
 export class RegistrationController {
   constructor(private readonly gameService: GameService) {}
-  @Get()
-  test() {
-    return 'hello';
-  }
+
   @Post()
   async validate(
     @Body() validateDto: ValidateDto
