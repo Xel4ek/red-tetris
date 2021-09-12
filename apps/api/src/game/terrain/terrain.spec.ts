@@ -23,7 +23,35 @@ describe('Terrain', () => {
 
   it('missRow should be undefined', function () {
     expect(terrain.missRow(1)).toBeUndefined();
-
   });
 
+  it('should start', function () {
+    expect(terrain.start()).toBeUndefined();
+  });
+
+  it('should return status', function () {
+    expect(terrain.status()).toBeDefined();
+  });
+
+  it('should stop', function () {
+    expect(terrain.stop()).toBeUndefined();
+  });
+
+  it('should move', function () {
+    terrain.start();
+    console.log(terrain.status());
+    expect(terrain.move('d')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('l')).toBeDefined();
+    expect(terrain.move('r')).toBeDefined();
+  });
+
+  it('should merge', function () {
+    expect(terrain.merge()).toBeDefined();
+  });
 });
