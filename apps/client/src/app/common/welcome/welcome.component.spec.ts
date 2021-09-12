@@ -10,9 +10,7 @@ import { WelcomeComponent } from './welcome.component';
 import { Observable, of } from 'rxjs';
 
 describe('WelcomeComponent', () => {
-  let formBuilder: FormBuilder;
   let router: Partial<Router>;
-  let title: Title;
   let gameControlService: Partial<GameControlService>;
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
@@ -59,10 +57,10 @@ describe('WelcomeComponent', () => {
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalled();
   });
-  // it('destroy', () => {
-  //   const destroy = jest.spyOn(component, 'destroy$');
-  //   component.ngOnDestroy();
-  //   fixture.detectChanges();
-  //   expect(destroy).toHaveBeenCalled();
-  // });
+  it('destroy', () => {
+    const destroy = jest.spyOn(component, 'ngOnDestroy');
+    component.ngOnDestroy();
+    fixture.detectChanges();
+    expect(destroy).toHaveBeenCalled();
+  });
 });
