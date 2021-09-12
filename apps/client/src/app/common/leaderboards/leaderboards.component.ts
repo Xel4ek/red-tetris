@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { WebsocketService } from '../../core/services/websocket/websocket.service';
 
-interface Leaderboards {
+export interface Leaderboards {
   name: string;
   pvp: number;
   score: number;
