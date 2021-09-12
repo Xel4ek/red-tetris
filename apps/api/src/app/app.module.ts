@@ -14,17 +14,18 @@ import { ScoreEntity } from '../game/entities/score.entity';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../..', 'dist/apps/client'),
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '63@w%j?wJQs+?M78',
-      database: 'red_tetris_db',
-      entities: [ScoreEntity],
-      synchronize: true,
-      autoLoadEntities: true,
-    }),
+    TypeOrmModule.forRoot(
+      {
+        type: 'postgres',
+        host: process.env["TYPEORM_HOST"],
+        port: Number(process.env["TYPEORM_PORT"]),
+        username: process.env["TYPEORM_USER"],
+        password: process.env["TYPEORM_PASSWORD"],
+        database: process.env["TYPEORM_DATABASE"],
+        entities: [ScoreEntity],
+        synchronize: true,
+        autoLoadEntities: true,
+      }),
   ],
 
   controllers: [],
