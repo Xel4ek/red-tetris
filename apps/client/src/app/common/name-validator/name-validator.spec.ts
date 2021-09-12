@@ -7,13 +7,13 @@ describe('NameValidator', () => {
 
   it('User exist', () => {
     gameControl = {
-      httpValidation: jest.fn().mockImplementation((obj) => of({ name: true })),
+      httpValidation: jest.fn().mockImplementation(() => of({ name: true })),
     };
     let result;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const validator = NameValidator.occupied(gameControl)({
-      get: (param) => null,
+      get: () => null,
     });
     validator.subscribe((data) => (result = data));
 
