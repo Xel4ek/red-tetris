@@ -1,82 +1,32 @@
-// tslint:disable
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  Pipe,
-  PipeTransform,
-  Injectable,
-  CUSTOM_ELEMENTS_SCHEMA,
-  NO_ERRORS_SCHEMA,
-  Directive,
-  Input,
-  Output,
-} from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { By } from '@angular/platform-browser';
-import { Observable, of as observableOf, throwError } from 'rxjs';
-
-import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HelpComponent } from './help.component';
 
-@Directive({ selector: '[oneviewPermitted]' })
-class OneviewPermittedDirective {
-  @Input() oneviewPermitted: any;
-}
-
-@Pipe({ name: 'translate' })
-class TranslatePipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'phoneNumber' })
-class PhoneNumberPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'safeHtml' })
-class SafeHtmlPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
 describe('HelpComponent', () => {
-  let fixture: any;
-  let component: any;
+  let fixture: ComponentFixture<HelpComponent>;
+  let component: HelpComponent;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule],
-      declarations: [
-        HelpComponent,
-        TranslatePipe,
-        PhoneNumberPipe,
-        SafeHtmlPipe,
-        OneviewPermittedDirective,
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
-      providers: [],
-    })
-      .overrideComponent(HelpComponent, {})
-      .compileComponents();
     fixture = TestBed.createComponent(HelpComponent);
     component = fixture.debugElement.componentInstance;
   });
 
-  afterEach(() => {
-    component.ngOnDestroy = function () {};
-    fixture.destroy();
-  });
-
-  it('should run #constructor()', async () => {
+  it('should we created', () => {
     expect(component).toBeTruthy();
   });
+  it('warning color', () => {
+    fixture.componentInstance.status = 'warning';
+    expect(component.background).toEqual('#cba7a7');
+  });
 
-  it('should run GetterDeclaration #background', async () => {
-    const background = component.background;
+  it('success color', () => {
+    fixture.componentInstance.status = 'success';
+    expect(component.background).toEqual('#a3cba1');
+  });
+  it('info color', () => {
+    fixture.componentInstance.status = 'info';
+    expect(component.background).toEqual('#a7bbd9');
+  });
+  it('default color', () => {
+    expect(component.background).toEqual('#a7bbd9');
   });
 });
