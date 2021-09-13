@@ -1,4 +1,4 @@
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Navigation, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import {
@@ -32,6 +32,7 @@ describe('WelcomeComponent', () => {
       },
     };
     await TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule],
       declarations: [WelcomeComponent],
       providers: [
         {

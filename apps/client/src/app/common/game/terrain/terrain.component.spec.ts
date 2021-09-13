@@ -1,21 +1,15 @@
 // tslint:disable
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  Directive,
+  Injectable,
+  Input,
+  NO_ERRORS_SCHEMA,
   Pipe,
   PipeTransform,
-  Injectable,
-  CUSTOM_ELEMENTS_SCHEMA,
-  NO_ERRORS_SCHEMA,
-  Directive,
-  Input,
-  Output,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { By } from '@angular/platform-browser';
-import { Observable, of as observableOf, throwError } from 'rxjs';
-
-import { Component } from '@angular/core';
 import { TerrainComponent } from './terrain.component';
 import { TerrainService } from './terrain.service';
 
@@ -77,11 +71,6 @@ describe('TerrainComponent', () => {
       .compileComponents();
     fixture = TestBed.createComponent(TerrainComponent);
     component = fixture.debugElement.componentInstance;
-  });
-
-  afterEach(() => {
-    component.ngOnDestroy = function () {};
-    fixture.destroy();
   });
 
   it('should run #constructor()', async () => {

@@ -19,7 +19,7 @@ describe('LeaderboardsComponent', () => {
           },
         ]);
       },
-      send(event: string, data: unknown = {}) {},
+      send: jest.fn(),
     };
     await TestBed.configureTestingModule({
       declarations: [LeaderboardsComponent],
