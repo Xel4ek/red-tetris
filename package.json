@@ -7,7 +7,7 @@
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
     "nx": "nx",
     "dev": "concurrently --kill-others \"nx run api:serve\" \"nx run client:serve:development\"",
-    "start:dev:db": "./apps/api/src/scripts/start-db.sh",
+    "start:dev:db": " ./apps/api/src/scripts/start-db.sh",
     "start": "ng serve",
     "build": "nx run api:build:production && nx run client:build:production",
     "test": "ng test",

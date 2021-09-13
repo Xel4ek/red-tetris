@@ -4,9 +4,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
-  static get border(): string {
-    return this._border;
-  }
   private static empty = '#ffffff';
   private static preview = '#6766669E';
   private static baseScore = 100;
@@ -14,7 +11,7 @@ export class Terrain {
   private static levelUpRows = 10;
   private static width = 10;
   private static height = 20;
-  private static _border = '#300144';
+  static border = 'rgba(0,0,0,0)';
   terrain: string[];
   piece: Piece;
   x: number;
@@ -46,7 +43,7 @@ export class Terrain {
       width: Terrain.width,
       height: Terrain.height,
       previewRow: Terrain.previewRow,
-      border: Terrain._border,
+      border: Terrain.border,
     };
   }
 
@@ -57,14 +54,7 @@ export class Terrain {
   }
 
   private static generateTerrain(): string[] {
-    return Array.from({ length: Terrain.width * Terrain.height }, (v, k) => {
-      if (
-        Math.trunc(k / Terrain.width) === Terrain.height - 1 ||
-        k % Terrain.width === 0 ||
-        k % Terrain.width === Terrain.width
-      ) {
-        return Terrain._border;
-      }
+    return Array.from({ length: Terrain.width * Terrain.height }, () => {
       return Terrain.empty;
     });
   }
@@ -84,11 +74,11 @@ export class Terrain {
     if (
       this.terrain
         .slice(0, rows * Terrain.width)
-        .every((point) => point === Terrain.empty || point === Terrain._border)
+        .every((point) => point === Terrain.empty)
     ) {
       this.terrain = [
         ...this.terrain.slice(rows * Terrain.width),
-        ...Array.from({ length: rows * Terrain.width }, () => Terrain._border),
+        ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
       ];
       this.share();
     } else {
@@ -207,10 +197,7 @@ export class Terrain {
         row * Terrain.width,
         (row + 1) * Terrain.width
       );
-      if (
-        terrainRow.some((point) => point === Terrain.empty) ||
-        terrainRow.every((point) => point === Terrain._border)
-      ) {
+      if (terrainRow.some((point) => point === Terrain.empty)) {
         terrain.push(...terrainRow);
       } else {
         ++miss;
@@ -219,13 +206,7 @@ export class Terrain {
     if (miss) {
       this.updateScore(miss);
       this.terrain = [
-        ...Array.from({ length: Terrain.width * miss }, (_, k) => {
-          if (
-            k % Terrain.width === 0 ||
-            k % Terrain.width === Terrain.width
-          ) {
-            return Terrain._border;
-          }
+        ...Array.from({ length: Terrain.width * miss }, () => {
           return Terrain.empty;
         }),
         ...terrain,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RegisterGameDto } from './dto/register-game.dto';
-import { PlayerDto, Role } from './dto/player.dto';
+import { GameStatus, PlayerDto, Role } from './dto/player.dto';
 import { WsMessage } from './dto/message.dto';
 import { RoomDto } from './dto/room.dto';
 import { ProfileDto } from './dto/profile.dto';
@@ -8,12 +8,12 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { RoomRepositoryService } from './room-repository/room-repository.service';
 import { PlayerRepositoryService } from './player-repository/player-repository.service';
 import { Terrain } from './terrain/terrain';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { LeaderboardsDto } from './dto/leaderboards.dto';
 import { LeaderboardsRepositoryService } from './leaderboards-repository/leaderboards-repository.service';
-import { InjectRepository } from "@nestjs/typeorm";
-import { ScoreEntity } from "./entities/score.entity";
-import { Repository } from "typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
+import { ScoreEntity } from './entities/score.entity';
+import { Repository } from 'typeorm';
 import { ValidateDto, ValidateResponseDto } from './dto/validate.dto';
 import { ErrorDto } from './dto/error.dto';
 
@@ -24,9 +24,9 @@ export class GameService {
     private readonly roomRepository: RoomRepositoryService,
     private readonly playerRepository: PlayerRepositoryService,
     private readonly leaderboardsRepository: LeaderboardsRepositoryService,
-    @InjectRepository(ScoreEntity) private scoreRepository: Repository<ScoreEntity>,
-  ) {
-  }
+    @InjectRepository(ScoreEntity)
+    private scoreRepository: Repository<ScoreEntity>
+  ) {}
 
   startGame(client: WebSocket) {
     const roomName = this.playerRepository.findByChannel(client).room;
@@ -75,15 +75,27 @@ export class GameService {
       }
     }
     this.playerRepository.push(
-      new PlayerDto(room, player, role, client, this.eventEmitter)
+      new PlayerDto(
+        room,
+        player,
+        role,
+        client,
+        this.eventEmitter,
+        this.scoreRepository
+      )
     );
-    let gameId = 0;
-    this.scoreRepository.save({ room: room, player: player }).then(r => gameId = r.id);
+    this.scoreRepository
+      .save({ room: room, player: player })
+      .catch(console.error);
     this.roomRepository.multicast(
       room,
       JSON.stringify({
         event: 'playersList',
-        data: this.playerRepository.findByRoom(room).map((pl) => ({name: pl.name, score: pl.scoreSingle, pvp: pl.scoreMulti})),
+        data: this.playerRepository.findByRoom(room).map((pl) => ({
+          name: pl.name,
+          score: pl.scoreSingle,
+          pvp: pl.scoreMulti,
+        })),
       })
     );
     return {
@@ -112,25 +124,32 @@ export class GameService {
   }
 
   @OnEvent('game.stop')
-  gameStop(player: PlayerDto) {
-    const players = this.playerRepository.findByRoom(player.room);
-    this.scoreRepository.findOne({ player: player.name }).then(
-      scoreEntity => {
-        if (!scoreEntity) {
-          console.log("Check DB connection");
-          return ;
-        }
-        if (players.length === 1) {
-          scoreEntity.scoreSingle = BigInt(Math.max(Number(scoreEntity.scoreSingle), player.scoreSingle));
-          player.scoreSingle = Number(scoreEntity.scoreSingle);
-        } else {
-          scoreEntity.scoreMulti += BigInt(1);
-          player.scoreMulti = Number(scoreEntity.scoreMulti);
-          player.send(JSON.stringify({ event: 'pvp.winner', data: { scorePVP: player.scoreMulti } }));
-        }
-        return this.scoreRepository.save(scoreEntity);
-        }
-    );
+  async gameStop(roomName: string) {
+    const players = this.playerRepository.findByRoom(roomName);
+    const player = players.find((pl) => pl.status === GameStatus.WINNER);
+    const scoreEntity = (await this.scoreRepository.findOne({
+      player: player.name,
+    })) ?? {
+      player: player.name,
+      scoreSingle: BigInt(0),
+      scoreMulti: BigInt(0),
+    };
+    if (players.length === 1) {
+      scoreEntity.scoreSingle = BigInt(
+        Math.max(Number(scoreEntity.scoreSingle), player.scoreSingle)
+      );
+      player.scoreSingle = Number(scoreEntity.scoreSingle);
+    } else {
+      scoreEntity.scoreMulti += BigInt(players.length);
+      player.scoreMulti = Number(scoreEntity.scoreMulti);
+      player.send(
+        JSON.stringify({
+          event: 'pvp.winner',
+          data: { scorePVP: player.scoreMulti },
+        })
+      );
+    }
+    await this.scoreRepository.save(scoreEntity);
     console.log('stop game in room, winner: ', player);
   }
 

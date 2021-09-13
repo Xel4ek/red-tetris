@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { RoomDto } from '../dto/room.dto';
 import { PlayerRepositoryService } from '../player-repository/player-repository.service';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { GameStatus, Role } from '../dto/player.dto';
+import { OnEvent } from '@nestjs/event-emitter';
+import { Role } from '../dto/player.dto';
 import { Terrain } from '../terrain/terrain';
 import { PieceGenerator } from '../../terrain/piece';
 
 @Injectable()
 export class RoomRepositoryService {
   private store: RoomDto[] = [];
-  constructor(
-    private readonly playerRepository: PlayerRepositoryService,
-    private readonly eventEmitter: EventEmitter2
-  ) {}
+
+  constructor(private readonly playerRepository: PlayerRepositoryService) {}
+
   findByName(name: string): RoomDto | undefined {
     return this.store.find((room) => room.name === name);
   }
@@ -20,6 +19,7 @@ export class RoomRepositoryService {
   push(room: RoomDto): void {
     this.store.push(room);
   }
+
   profileMulticast(room: RoomDto) {
     this.playerRepository.findByRoom(room.name).map((player) =>
       player.channels.map((c) =>
@@ -37,6 +37,7 @@ export class RoomRepositoryService {
       )
     );
   }
+
   multicast(roomName: string, data: string) {
     this.playerRepository
       .findByRoom(roomName)
@@ -51,16 +52,19 @@ export class RoomRepositoryService {
     const pieceGenerator = new PieceGenerator();
     players.map((pl) => pl.gameStart(pieceGenerator));
   }
+
   @OnEvent('game.stop')
   gameStop(roomName: string) {
     const room = this.getByName(roomName);
     room.inGame = false;
     this.profileMulticast(room);
-    console.log('Game stopped at ', room);
+    // console.log('Game stopped at ', room);
   }
+
   getByName(roomName: string) {
     return this.store.find((room) => room.name === roomName);
   }
+
   @OnEvent('terrain.update')
   terrainUpdate(terrain: Terrain) {
     const player = this.playerRepository.findByTerrain(terrain);
@@ -83,6 +87,7 @@ export class RoomRepositoryService {
       );
     }
   }
+
   disconnect(channel: WebSocket) {
     const player = this.playerRepository.findByChannel(channel);
     if (!player) return;
@@ -100,6 +105,7 @@ export class RoomRepositoryService {
       this.store = this.store.filter((r) => r !== room);
     }
   }
+
   @OnEvent('terrain.collapseRow')
   collapseRow(terrain: Terrain, miss: number) {
     const player = this.playerRepository.findByTerrain(terrain);

@@ -15,16 +15,19 @@ import { config } from '../../services/websocket/websocket.config';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Role } from '../../interfaces/role';
-import { Profile } from '../../interfaces/profile';
-import { of } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { NO_ERRORS_SCHEMA, ViewContainerRef } from '@angular/core';
 
 describe('SecureDirective', () => {
   let fixture: ComponentFixture<InitGameComponent>;
-  let component: InitGameComponent;
-  let player: Profile;
+  let profileService: ProfileService;
+  let viewContainerRef: Partial<ViewContainerRef>;
   beforeEach(() => {
-    fixture = TestBed.configureTestingModule({
+    viewContainerRef = {
+      createEmbeddedView: jest.fn(),
+      clear: jest.fn(),
+    };
+    TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
       declarations: [SecureDirective, InitGameComponent],
       providers: [
@@ -32,23 +35,29 @@ describe('SecureDirective', () => {
         WebsocketService,
         GameControlService,
         ProfileService,
+        ViewContainerRef,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
-    }).createComponent(InitGameComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-  it('should create an instance', fakeAsync(() => {
-    player = {
+    }).compileComponents();
+    const subject = new BehaviorSubject({
       role: Role.ADMIN,
       inGame: false,
       name: 'testName',
       room: 'testRoom',
-    };
-    component.profile$ = of(player);
-    tick();
+    });
+    profileService = TestBed.inject(ProfileService);
+    jest
+      .spyOn(profileService, 'profile')
+      .mockImplementation(() => subject.asObservable());
+    fixture = TestBed.createComponent(InitGameComponent);
     fixture.detectChanges();
+  });
+  it('should create an instance', fakeAsync(() => {
     const el = fixture.debugElement.query(By.directive(SecureDirective));
+    tick();
+    const profileServiceProfile = jest.spyOn(profileService, 'profile');
     expect(el).not.toBeTruthy();
+    expect(viewContainerRef.clear).not.toBeCalled();
+    expect(profileServiceProfile).toBeCalled();
   }));
 });
