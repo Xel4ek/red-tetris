@@ -1,17 +1,18 @@
-<div *ngIf='profile$ | async as profile'>
-  <ng-container *ngIf='!profile.inGame'>
-    <ng-container *ngIf='profile.role === role.ADMIN else wait'>
+<div *ngIf="profile$ | async as profile">
+  <ng-container *ngIf="!profile.inGame">
+    <ng-container *ngIf="profile.role === role.ADMIN; else wait">
       <red-tetris-help>
-        Hello {{profile.name}}! You are admin on this room. Start game when ready
+        Hello {{ profile.name }}! You are admin on this room. Start game when
+        ready
       </red-tetris-help>
     </ng-container>
     <ng-template #wait>
       <red-tetris-help>
-        Hello {{profile.name}}! Please wait when admin start the game
+        Hello {{ profile.name }}! Please wait when admin start the game
       </red-tetris-help>
     </ng-template>
   </ng-container>
-  <mat-accordion multi *ngIf='playerList$ | async as players'>
+  <mat-accordion multi *ngIf="playerList$ | async as players">
     <mat-expansion-panel *ngFor="let player of players">
       <mat-expansion-panel-header>
         <mat-panel-title>
@@ -20,13 +21,21 @@
       </mat-expansion-panel-header>
     </mat-expansion-panel>
   </mat-accordion>
-  <ng-container *ngIf='!profile.inGame'>
-  <div class='start-button' *redTetrisSecure='role.ADMIN' [ngStyle]="{'justify-content': 'flex-end'}">
-    <button  mat-raised-button color="primary" (click)='startGame()'>Start Game!</button>
-  </div>
-  <div class='start-button'>
-    <button routerLink='/' mat-raised-button color="primary">Quit</button>
-    <button routerLink='/leaderboards' mat-raised-button color="primary">Leaderboards</button>
-  </div>
+  <ng-container *ngIf="!profile.inGame">
+    <div
+      class="start-button"
+      *redTetrisSecure="role.ADMIN"
+      [ngStyle]="{ 'justify-content': 'flex-end' }"
+    >
+      <button mat-raised-button color="primary" (click)="startGame()">
+        Start Game!
+      </button>
+    </div>
+    <div class="start-button">
+      <button routerLink="/" mat-raised-button color="primary">Quit</button>
+      <button routerLink="/leaderboards" mat-raised-button color="primary">
+        Leaderboards
+      </button>
+    </div>
   </ng-container>
 </div>

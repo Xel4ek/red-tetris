@@ -89,7 +89,7 @@ export class MainComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  handleKeyboardEvent(code: string) {
+  private handleKeyboardEvent(code: string) {
     if (code === 'KeyW') {
       this.gameControlService.rotate('l');
     }

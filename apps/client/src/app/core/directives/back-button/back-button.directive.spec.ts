@@ -1,23 +1,27 @@
 import { BackButtonDirective } from './back-button.directive';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import { AboutComponent } from '../../../common/about/about.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/compiler';
 import { By } from '@angular/platform-browser';
+import { Location } from '@angular/common';
 
 describe('BackButtonDirective', () => {
   let fixture: ComponentFixture<AboutComponent>;
-  const locationBack = jest.fn;
-  let location: { back: any };
+  const back = jest.fn();
   beforeEach(() => {
-    location = {
-      back: locationBack,
-    };
     fixture = TestBed.configureTestingModule({
       declarations: [BackButtonDirective, AboutComponent],
       providers: [
         {
           provide: Location,
-          useValue: location,
+          useValue: {
+            back: back,
+          },
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -28,14 +32,13 @@ describe('BackButtonDirective', () => {
     const el = fixture.debugElement.query(By.directive(BackButtonDirective));
     expect(el).toBeTruthy();
   });
-  it('should back called', () => {
+  it('should back called', fakeAsync(() => {
     const button = fixture.debugElement.query(
       By.directive(BackButtonDirective)
     ).nativeElement;
     button.click();
+    tick();
     fixture.detectChanges();
-    fixture.whenStable().then(() => {
-      expect(locationBack).toHaveBeenCalled();
-    });
-  });
+    expect(back).toHaveBeenCalled();
+  }));
 });
