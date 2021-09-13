@@ -4,14 +4,17 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
+  static get border(): string {
+    return this._border;
+  }
   private static empty = '#ffffff';
-  private static border = '#300144';
   private static preview = '#6766669E';
   private static baseScore = 100;
   private static previewRow = 6;
   private static levelUpRows = 10;
   private static width = 10;
   private static height = 20;
+  private static _border = '#300144';
   terrain: string[];
   piece: Piece;
   x: number;
@@ -43,7 +46,7 @@ export class Terrain {
       width: Terrain.width,
       height: Terrain.height,
       previewRow: Terrain.previewRow,
-      border: Terrain.border,
+      border: Terrain._border,
     };
   }
 
@@ -60,7 +63,7 @@ export class Terrain {
         k % Terrain.width === 0 ||
         k % Terrain.width === Terrain.width
       ) {
-        return Terrain.border;
+        return Terrain._border;
       }
       return Terrain.empty;
     });
@@ -81,11 +84,11 @@ export class Terrain {
     if (
       this.terrain
         .slice(0, rows * Terrain.width)
-        .every((point) => point === Terrain.empty || point === Terrain.border)
+        .every((point) => point === Terrain.empty || point === Terrain._border)
     ) {
       this.terrain = [
         ...this.terrain.slice(rows * Terrain.width),
-        ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
+        ...Array.from({ length: rows * Terrain.width }, () => Terrain._border),
       ];
       this.share();
     } else {
@@ -206,7 +209,7 @@ export class Terrain {
       );
       if (
         terrainRow.some((point) => point === Terrain.empty) ||
-        terrainRow.every((point) => point === Terrain.border)
+        terrainRow.every((point) => point === Terrain._border)
       ) {
         terrain.push(...terrainRow);
       } else {
@@ -221,7 +224,7 @@ export class Terrain {
             k % Terrain.width === 0 ||
             k % Terrain.width === Terrain.width
           ) {
-            return Terrain.border;
+            return Terrain._border;
           }
           return Terrain.empty;
         }),
