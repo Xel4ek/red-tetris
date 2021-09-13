@@ -5,13 +5,13 @@ import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
   private static empty = '#ffffff';
-  static border = '#300144';
+  private static border = '#300144';
   private static preview = '#6766669E';
   private static baseScore = 100;
   private static previewRow = 6;
   private static levelUpRows = 10;
-  private static width = 12;
-  private static height = 21;
+  private static width = 10;
+  private static height = 20;
   terrain: string[];
   piece: Piece;
   x: number;
@@ -31,7 +31,7 @@ export class Terrain {
   ) {
     this.terrain = Terrain.generateTerrain();
     this.piece = this.getNextPiece();
-    this.x = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.x = Math.trunc((Terrain.width - this.piece.size) / 2);
     this.y = 0;
     this.score = 0;
     this.level = 1;
@@ -58,7 +58,7 @@ export class Terrain {
       if (
         Math.trunc(k / Terrain.width) === Terrain.height - 1 ||
         k % Terrain.width === 0 ||
-        k % Terrain.width === Terrain.width - 1
+        k % Terrain.width === Terrain.width
       ) {
         return Terrain.border;
       }
@@ -189,7 +189,7 @@ export class Terrain {
     this.collapseRows();
     this.pieceColor = Terrain.randomColor();
     this.piece = this.getNextPiece();
-    this.x = Math.trunc((Terrain.width - this.piece.size + 1) / 2);
+    this.x = Math.trunc((Terrain.width - this.piece.size) / 2);
     this.y = 0;
     if (!this.validate()) {
       this.eventEmitter.emit('terrain.overflow', this);
@@ -219,7 +219,7 @@ export class Terrain {
         ...Array.from({ length: Terrain.width * miss }, (_, k) => {
           if (
             k % Terrain.width === 0 ||
-            k % Terrain.width === Terrain.width - 1
+            k % Terrain.width === Terrain.width
           ) {
             return Terrain.border;
           }
