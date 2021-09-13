@@ -12,6 +12,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Role } from '../../interfaces/role';
 import { Profile } from '../../interfaces/profile';
 import { of } from 'rxjs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('SecureDirective', () => {
   let fixture: ComponentFixture<InitGameComponent>;
@@ -27,7 +28,7 @@ describe('SecureDirective', () => {
         GameControlService,
         ProfileService,
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
     }).createComponent(InitGameComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
