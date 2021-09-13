@@ -6,6 +6,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { WelcomeComponent } from '../../../common/welcome/welcome.component';
 
 describe('GameControlService', () => {
   let service: GameControlService;
@@ -16,7 +17,16 @@ describe('GameControlService', () => {
       send: jest.fn(),
     };
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [WelcomeComponent],
+      imports: [
+        RouterTestingModule.withRoutes([
+          {
+            path: 'welcome',
+            component: WelcomeComponent,
+          },
+        ]),
+        HttpClientTestingModule,
+      ],
       providers: [
         {
           provide: WebsocketService,
@@ -24,7 +34,7 @@ describe('GameControlService', () => {
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
-    });
+    }).compileComponents();
     service = TestBed.inject(GameControlService);
   });
 

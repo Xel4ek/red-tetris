@@ -6,6 +6,7 @@ import { ProfileService } from '../../../core/services/profile/profile.service';
 import { of } from 'rxjs';
 import { Role } from '../../../core/interfaces/role';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { WelcomeComponent } from '../../welcome/welcome.component';
 
 describe('MainComponent', () => {
   let fixture: ComponentFixture<MainComponent>;
@@ -36,7 +37,14 @@ describe('MainComponent', () => {
     };
     TestBed.configureTestingModule({
       declarations: [MainComponent],
-      imports: [RouterTestingModule],
+      imports: [
+        RouterTestingModule.withRoutes([
+          {
+            path: 'welcome',
+            component: WelcomeComponent,
+          },
+        ]),
+      ],
       providers: [
         {
           provide: GameControlService,

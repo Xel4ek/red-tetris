@@ -1,5 +1,10 @@
 import { SecureDirective } from './secure.directive';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/compiler';
 import { InitGameComponent } from '../../../common/game/init-game/init-game.component';
 import { By } from '@angular/platform-browser';
@@ -33,7 +38,7 @@ describe('SecureDirective', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-  it('should create an instance', () => {
+  it('should create an instance', fakeAsync(() => {
     player = {
       role: Role.ADMIN,
       inGame: false,
@@ -41,10 +46,9 @@ describe('SecureDirective', () => {
       room: 'testRoom',
     };
     component.profile$ = of(player);
+    tick();
     fixture.detectChanges();
-    fixture.whenStable().then(() => {
-      const el = fixture.debugElement.query(By.directive(SecureDirective));
-      expect(el).toBeTruthy();
-    });
-  });
+    const el = fixture.debugElement.query(By.directive(SecureDirective));
+    expect(el).not.toBeTruthy();
+  }));
 });
