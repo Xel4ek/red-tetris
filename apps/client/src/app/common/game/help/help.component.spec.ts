@@ -1,11 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HelpComponent } from './help.component';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('HelpComponent', () => {
   let fixture: ComponentFixture<HelpComponent>;
   let component: HelpComponent;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
+    });
     fixture = TestBed.createComponent(HelpComponent);
     component = fixture.debugElement.componentInstance;
   });
