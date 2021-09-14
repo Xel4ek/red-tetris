@@ -4,6 +4,16 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 
 export class Terrain {
+  get terrain(): string[] {
+    return this._terrain;
+  }
+
+  set terrain(value: string[]) {
+    this._terrain = value;
+    const clone = Object.assign([], value);
+    this.terrain2D = Array(Terrain.height).fill(Array(Terrain.width)).map(() => clone.splice(0, Terrain.width));
+  }
+
   private static empty = '#ffffff';
   private static preview = '#6766669E';
   private static baseScore = 100;
@@ -12,7 +22,8 @@ export class Terrain {
   private static width = 10;
   private static height = 20;
   static border = 'rgba(0,0,0,0)';
-  terrain: string[];
+  private _terrain: string[];
+  terrain2D: string[][];
   piece: Piece;
   x: number;
   y: number;
@@ -29,7 +40,7 @@ export class Terrain {
     private readonly eventEmitter: EventEmitter2,
     private readonly pieceGenerator: PieceGenerator
   ) {
-    this.terrain = Terrain.generateTerrain();
+    this.terrain = Array(Terrain.height * Terrain.width).fill(Terrain.empty);
     this.piece = this.getNextPiece();
     this.x = Math.trunc((Terrain.width - this.piece.size) / 2);
     this.y = 0;
@@ -51,12 +62,6 @@ export class Terrain {
     return (
       '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6)
     );
-  }
-
-  private static generateTerrain(): string[] {
-    return Array.from({ length: Terrain.width * Terrain.height }, () => {
-      return Terrain.empty;
-    });
   }
 
   updateScore(miss: number) {
@@ -136,8 +141,8 @@ export class Terrain {
         col < positionCol + this.piece.size
       ) {
         return this.piece.show()[
-          (row - positionRow) * this.piece.size + (col - positionCol)
-        ]
+        (row - positionRow) * this.piece.size + (col - positionCol)
+          ]
           ? this.pieceColor
           : el;
       }
@@ -245,32 +250,20 @@ export class Terrain {
   }
 
   private validate(): boolean {
-    // todo validation broken temp solution need refactor
-    const positionRow = this.y;
-    const positionCol = this.x;
-    return this.terrain
-      .map((el, index) => {
-        const row = Math.trunc(index / Terrain.width);
-        const col = index % Terrain.width;
-        if (
-          row >= positionRow &&
-          row < positionRow + this.piece.size &&
-          col >= positionCol &&
-          col < positionCol + this.piece.size
-        ) {
-          const pos =
-            (row - positionRow) * this.piece.size + (col - positionCol);
-          if (
-            pos >= 0 &&
-            pos < this.piece.show().length &&
-            this.piece.show()[pos] &&
-            el !== Terrain.empty
-          ) {
-            return false;
-          }
-        }
-        return true;
-      })
-      .every((el) => el);
+    //TODO: fix rotation at sides
+    return this.piece.show().every((value, idx) => {
+        const posX = this.x + idx % this.piece.size;
+        const posY = this.y + Math.trunc(idx / this.piece.size);
+        return value === false
+          || (
+            value === true
+            && posX > 0
+            && posX < Terrain.width
+            && posY < Terrain.height - 1
+            && this.terrain2D[posY][posX] === Terrain.empty
+          );
+      }
+    );
+
   }
 }
