@@ -96,6 +96,8 @@ export class Terrain {
     this.piece.rotate(direction);
     if (!this.validate()) {
       this.piece.rotate(direction === 'r' ? 'l' : 'r');
+      this.piece.rotate(direction === 'r' ? 'l' : 'r');
+      this.piece.rotate(direction === 'r' ? 'l' : 'r');
     } else {
       this.share();
     }
@@ -257,9 +259,9 @@ export class Terrain {
         return value === false
           || (
             value === true
-            && posX > 0
+            && posX >= 0
             && posX < Terrain.width
-            && posY < Terrain.height - 1
+            && posY < Terrain.height
             && this.terrain2D[posY][posX] === Terrain.empty
           );
       }
