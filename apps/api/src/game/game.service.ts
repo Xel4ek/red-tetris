@@ -136,7 +136,7 @@ export class GameService {
     };
     if (players.length === 1) {
       scoreEntity.scoreSingle = BigInt(
-        Math.max(Number(scoreEntity.scoreSingle), player.scoreSingle)
+        Math.max(Number(scoreEntity.scoreSingle), player._terrain.score)
       );
       player.scoreSingle = Number(scoreEntity.scoreSingle);
     } else {
