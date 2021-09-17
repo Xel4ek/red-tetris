@@ -18,9 +18,9 @@ export class LeaderboardsRepositoryService {
   ) {
     this.updateTop();
   }
-  @OnEvent('game.stop')
+  @OnEvent('game.update_top')
   updateTop() {
-    this.repository.findAndCount({ take: 10 }).then((data) => {
+    this.repository.findAndCount({ take: 10, order: {scoreSingle: "DESC", scoreMulti: "DESC"} }).then((data) => {
       this.store$.next(
         data[0].map((entry) => ({
           name: entry.player,
@@ -30,6 +30,7 @@ export class LeaderboardsRepositoryService {
       );
     });
   }
+
   getTop(): Observable<LeaderboardsDto[]> {
     return this.store$.asObservable();
   }

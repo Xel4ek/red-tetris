@@ -21,7 +21,7 @@ export class Terrain {
   private static levelUpRows = 10;
   private static width = 10;
   private static height = 20;
-  static border = 'rgba(0,0,0,0)';
+  static border = '#4e4747';
   private _terrain: string[];
   terrain2D: string[][];
   piece: Piece;
@@ -76,6 +76,7 @@ export class Terrain {
   }
 
   missRow(rows: number) {
+    console.log("row:" + rows);
     if (
       this.terrain
         .slice(0, rows * Terrain.width)
@@ -85,6 +86,7 @@ export class Terrain {
         ...this.terrain.slice(rows * Terrain.width),
         ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
       ];
+
       this.share();
     } else {
       this.eventEmitter.emit('terrain.overflow', this);
@@ -204,7 +206,7 @@ export class Terrain {
         row * Terrain.width,
         (row + 1) * Terrain.width
       );
-      if (terrainRow.some((point) => point === Terrain.empty)) {
+      if (terrainRow.some((point) => point === Terrain.empty || point === Terrain.border)) {
         terrain.push(...terrainRow);
       } else {
         ++miss;

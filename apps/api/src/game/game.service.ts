@@ -8,7 +8,7 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { RoomRepositoryService } from './room-repository/room-repository.service';
 import { PlayerRepositoryService } from './player-repository/player-repository.service';
 import { Terrain } from './terrain/terrain';
-import { map, Observable } from 'rxjs';
+import { first, map, Observable } from 'rxjs';
 import { LeaderboardsDto } from './dto/leaderboards.dto';
 import { LeaderboardsRepositoryService } from './leaderboards-repository/leaderboards-repository.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,7 +26,8 @@ export class GameService {
     private readonly leaderboardsRepository: LeaderboardsRepositoryService,
     @InjectRepository(ScoreEntity)
     private scoreRepository: Repository<ScoreEntity>
-  ) {}
+  ) {
+  }
 
   startGame(client: WebSocket) {
     const roomName = this.playerRepository.findByChannel(client).room;
@@ -125,7 +126,7 @@ export class GameService {
 
   @OnEvent('game.stop')
   async gameStop(roomName: string) {
-    const players = this.playerRepository.findByRoom(roomName);
+    const players = this.playerRepository.findByRoom(roomName).filter(pl => pl.role >= Role.PLAYER);
     const player = players.find((pl) => pl.status === GameStatus.WINNER);
     const scoreEntity = (await this.scoreRepository.findOne({
       player: player.name,
@@ -150,6 +151,14 @@ export class GameService {
       );
     }
     await this.scoreRepository.save(scoreEntity);
+    this.leaderboardsRepository.getTop().pipe(first(), map(top => {
+      const update = top.find(el => el.score < player.scoreSingle ||
+      el.pvp < player.scoreMulti);
+      if (update) {
+        this.eventEmitter.emit('game.update_top');
+      }
+    }))
+      .subscribe();
     console.log('stop game in room, winner: ', player);
   }
 

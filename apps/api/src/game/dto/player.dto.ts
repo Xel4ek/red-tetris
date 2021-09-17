@@ -48,11 +48,7 @@ export class PlayerDto {
   _terrain: Terrain;
 
   get terrain(): string[] {
-    return this.removeBorder(this._terrain.merge());
-  }
-
-  removeBorder(terrain: string[]): string[] {
-    return terrain.filter((item) => item != Terrain.border);
+    return this._terrain.merge();
   }
 
   gameStop(): void {

@@ -109,7 +109,7 @@ export class RoomRepositoryService {
   @OnEvent('terrain.collapseRow')
   collapseRow(terrain: Terrain, miss: number) {
     const player = this.playerRepository.findByTerrain(terrain);
-    this.playerRepository.findByRoom(player.room).map((pl) => {
+    this.playerRepository.findByRoom(player.room).filter(pl => pl.role >= Role.PLAYER).map((pl) => {
       if (pl !== player) {
         pl._terrain.missRow(miss);
       }
