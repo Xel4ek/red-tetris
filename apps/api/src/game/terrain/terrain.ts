@@ -11,7 +11,9 @@ export class Terrain {
   set terrain(value: string[]) {
     this._terrain = value;
     const clone = Object.assign([], value);
-    this.terrain2D = Array(Terrain.height).fill(Array(Terrain.width)).map(() => clone.splice(0, Terrain.width));
+    this.terrain2D = Array(Terrain.height)
+      .fill(Array(Terrain.width))
+      .map(() => clone.splice(0, Terrain.width));
   }
 
   private static empty = '#ffffff';
@@ -21,7 +23,7 @@ export class Terrain {
   private static levelUpRows = 10;
   private static width = 10;
   private static height = 20;
-  static border = '#4e4747';
+  static border = '#b0b0b0';
   private _terrain: string[];
   terrain2D: string[][];
   piece: Piece;
@@ -76,7 +78,7 @@ export class Terrain {
   }
 
   missRow(rows: number) {
-    console.log("row:" + rows);
+    console.log('row:' + rows);
     if (
       this.terrain
         .slice(0, rows * Terrain.width)
@@ -131,7 +133,9 @@ export class Terrain {
     }
     return this;
   }
-
+  drop() {
+    //TODO DROP event implementation
+  }
   merge(): string[] {
     const positionRow = this.y;
     const positionCol = this.x;
@@ -145,8 +149,8 @@ export class Terrain {
         col < positionCol + this.piece.size
       ) {
         return this.piece.show()[
-        (row - positionRow) * this.piece.size + (col - positionCol)
-          ]
+          (row - positionRow) * this.piece.size + (col - positionCol)
+        ]
           ? this.pieceColor
           : el;
       }
@@ -206,7 +210,11 @@ export class Terrain {
         row * Terrain.width,
         (row + 1) * Terrain.width
       );
-      if (terrainRow.some((point) => point === Terrain.empty || point === Terrain.border)) {
+      if (
+        terrainRow.some(
+          (point) => point === Terrain.empty || point === Terrain.border
+        )
+      ) {
         terrain.push(...terrainRow);
       } else {
         ++miss;
@@ -256,18 +264,16 @@ export class Terrain {
   private validate(): boolean {
     //TODO: fix rotation at sides
     return this.piece.show().every((value, idx) => {
-        const posX = this.x + idx % this.piece.size;
-        const posY = this.y + Math.trunc(idx / this.piece.size);
-        return value === false
-          || (
-            value === true
-            && posX >= 0
-            && posX < Terrain.width
-            && posY < Terrain.height
-            && this.terrain2D[posY][posX] === Terrain.empty
-          );
-      }
-    );
-
+      const posX = this.x + (idx % this.piece.size);
+      const posY = this.y + Math.trunc(idx / this.piece.size);
+      return (
+        value === false ||
+        (value === true &&
+          posX >= 0 &&
+          posX < Terrain.width &&
+          posY < Terrain.height &&
+          this.terrain2D[posY][posX] === Terrain.empty)
+      );
+    });
   }
 }

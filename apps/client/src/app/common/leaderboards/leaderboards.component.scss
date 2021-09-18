@@ -1,24 +1,37 @@
-.title{
+.title {
   padding: 2rem 0;
   text-align: center;
 }
+::ng-deep {
+  $base-color: #00c722;
+  @for $i from 1 through 4 {
+    mat-row:nth-child(#{$i}) {
+      background-color: lighten($base-color, $i * 13%);
+    }
+  }
+  mat-cell:first-of-type,
+  mat-header-cell:first-of-type,
+  mat-footer-cell:first-of-type {
+    padding-left: 5px !important;
+  }
+  .mat-column-name {
+    min-width: 50%;
+    padding-left: 2rem;
+  }
+  .mat-column-score,
+  .mat-column-pvp,
+  .mat-column-position {
+    justify-content: center;
+  }
+  .mat-column-position {
+    width: 32px;
+    border-right: 1px solid currentColor;
+    padding-right: 5px;
+  }
+}
+
 .leaderboards {
-  display: grid;
   max-width: 600px;
   margin: 0 auto;
-  background: silver;
-  grid: repeat(11, 2rem) / minmax(300px, 2fr) 1fr 1fr;
-  gap: 1px;
-  & > div {
-    overflow: hidden;
-    display: flex;
-    min-width: 0;
-    align-items: center;
-    justify-content: center;
-    background: white;
-  }
-
-  &-head {
-    font-weight: bold;
-  }
+  width: 100%;
 }

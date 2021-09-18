@@ -4,7 +4,14 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Role } from '../../interfaces/role';
 
+export interface PlayerDto {
+  name: string;
+  pvp: number;
+  score: number;
+  role: Role;
+}
 export interface GameStatus {
   score: number;
   currentGame: string;
@@ -47,7 +54,7 @@ export interface ErrorMessage {
 export class GameControlService implements OnDestroy {
   private readonly room$ = new ReplaySubject<string>(1);
   private readonly player$ = new ReplaySubject<string>(1);
-  private readonly playersList$ = new ReplaySubject<string[]>(1);
+  private readonly playersList$ = new ReplaySubject<PlayerDto[]>(1);
   private readonly preview$ = new ReplaySubject<string[]>(1);
   private readonly status$ = new ReplaySubject<GameStatus>(1);
   private readonly settings$ = new ReplaySubject<GameSettings>(1);
@@ -81,10 +88,10 @@ export class GameControlService implements OnDestroy {
         tap((data) => this.settings$.next(data))
       )
       .subscribe();
-    ws.on<{name: string}[]>('playersList')
+    ws.on<PlayerDto[]>('playersList')
       .pipe(
         takeUntil(this.destroy$),
-        tap((data) => this.playersList$.next(data.map(entry => entry.name)))
+        tap((data) => this.playersList$.next(data))
       )
       .subscribe();
     ws.on<string[]>('pieceSerial.update')
@@ -129,7 +136,7 @@ export class GameControlService implements OnDestroy {
     return this.room$.asObservable();
   }
 
-  playersList(): Observable<string[]> {
+  playersList(): Observable<PlayerDto[]> {
     return this.playersList$.asObservable();
   }
 
@@ -144,7 +151,9 @@ export class GameControlService implements OnDestroy {
   move(direction: string) {
     this.ws.send('pieceMove', direction);
   }
-
+  drop() {
+    this.ws.send('pieceDrop');
+  }
   piecePreview() {
     return this.preview$.asObservable();
   }

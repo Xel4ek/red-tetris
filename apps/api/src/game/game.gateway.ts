@@ -65,6 +65,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     this.gameService.pieceMove(client, direction);
   }
+  @SubscribeMessage('pieceDrop')
+  pieceDrop(@ConnectedSocket() client: WebSocket) {
+    this.gameService.pieceDrop(client);
+  }
   @SubscribeMessage('leaderboards')
   leaderboards(): Observable<WsMessage<LeaderboardsDto[]>> {
     return this.gameService.leaderboards();

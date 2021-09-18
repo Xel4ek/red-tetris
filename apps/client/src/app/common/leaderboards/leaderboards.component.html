@@ -1,14 +1,38 @@
-<div class='about-title'>
-  Leaderboards
-</div>
-<div class='leaderboards'>
-  <div class='leaderboards-head'>Name</div>
-  <div class='leaderboards-head'>PvP</div>
-  <div class='leaderboards-head'>Score</div>
-  <ng-container *ngFor='let entry of leaderboards$ | async'>
-    <div  *ngFor='let item of entry | keyvalue' [title]='item.value'>{{item.value | truncate: 20}}</div>
+<div class="about-title">Leaderboards</div>
+<mat-table
+  *ngIf="leaderboards$ | async as leaderboards"
+  [dataSource]="leaderboards"
+  class="mat-elevation-z8 leaderboards"
+>
+  <ng-container matColumnDef="position">
+    <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
+    <mat-cell *matCellDef="let element">
+      {{ element.position }}
+    </mat-cell>
   </ng-container>
-</div>
-<div class='start-button' [ngStyle]="{'justify-content': 'flex-end'}">
-  <button mat-raised-button color='primary' redTetrisBackButton>Back</button>
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+    <mat-cell *matCellDef="let element">
+      {{ element.name | truncate: 20 }}
+    </mat-cell>
+  </ng-container>
+
+  <!-- Single Player Column -->
+  <ng-container matColumnDef="score">
+    <mat-header-cell *matHeaderCellDef> Single Player </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.score }} </mat-cell>
+  </ng-container>
+
+  <!-- Multi Player Column -->
+  <ng-container matColumnDef="pvp">
+    <mat-header-cell *matHeaderCellDef> Multi Player </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.pvp }} </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="leaderboards[0] | keys"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: leaderboards[0] | keys"></mat-row>
+</mat-table>
+<div class="start-button" [ngStyle]="{ 'justify-content': 'flex-end' }">
+  <button mat-raised-button color="primary" redTetrisBackButton>Back</button>
 </div>

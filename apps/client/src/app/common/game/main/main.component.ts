@@ -8,13 +8,14 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromEvent, NEVER, Observable, Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { Title } from '@angular/platform-browser';
+import { DomSanitizer, Title } from '@angular/platform-browser';
 import {
   GameControlService,
   GameSettings,
 } from '../../../core/services/game-control/game-control.service';
 import { Profile } from '../../../core/interfaces/profile';
 import { ProfileService } from '../../../core/services/profile/profile.service';
+import { MatIconRegistry } from '@angular/material/icon';
 
 @Component({
   selector: 'red-tetris-main',
@@ -36,8 +37,22 @@ export class MainComponent implements OnDestroy {
     private readonly gameControlService: GameControlService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly profileService: ProfileService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly matIconRegistry: MatIconRegistry,
+    private readonly domSanitizer: DomSanitizer
   ) {
+    this.matIconRegistry.addSvgIcon(
+      `swords`,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(
+        '/assets/swords-sword-svgrepo-com.svg'
+      )
+    );
+    this.matIconRegistry.addSvgIcon(
+      `single`,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(
+        '/assets/ac756a3c-d97e-465a-93f1-e6bd126a3acf.svg'
+      )
+    );
     this.settings$ = gameControlService.settings();
     activatedRoute.fragment
       .pipe(
@@ -72,14 +87,19 @@ export class MainComponent implements OnDestroy {
           inGame ? fromEvent<KeyboardEvent>(document, 'keydown') : NEVER
         ),
         takeUntil(this.destroy$),
-        tap(({ code }) => this.handleKeyboardEvent(code))
+        tap((event) => {
+          event.preventDefault();
+          this.handleKeyboardEvent(event.code);
+        })
       )
       .subscribe();
     this.playerList$ = this.profile$.pipe(
       switchMap(({ name }) =>
         this.gameControlService
           .playersList()
-          .pipe(map((data) => data.filter((p) => p !== name)))
+          .pipe(
+            map((data) => data.map((pl) => pl.name).filter((p) => p !== name))
+          )
       )
     );
   }
@@ -96,5 +116,6 @@ export class MainComponent implements OnDestroy {
     if (code === 'KeyA') this.gameControlService.move('l');
     if (code === 'KeyD') this.gameControlService.move('r');
     if (code === 'KeyS') this.gameControlService.move('d');
+    if (code === 'Space') this.gameControlService.drop();
   }
 }

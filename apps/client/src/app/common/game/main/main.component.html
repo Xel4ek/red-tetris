@@ -1,25 +1,34 @@
-<ng-container *ngIf='settings$ | async as settings'>
-  <ng-container *ngIf='profile$ | async as profile'>
-    <red-tetris-help status='success' style='text-align: center'>
-      Welcome Red Tetris! `{{profile.room}}` lobby
+<ng-container *ngIf="settings$ | async as settings">
+  <ng-container *ngIf="profile$ | async as profile">
+    <red-tetris-help status="success" style="text-align: center">
+      Welcome Red Tetris! `{{ profile.room }}` lobby
     </red-tetris-help>
-    <div class='terrain-wrapper enemy-terrain-wrapper'>
-      <ng-container *ngIf='playerList$ | async as playerList'>
-        <div *ngFor='let playerTerrain of playerList' class='enemy-terrain'>
-          <red-tetris-terrain [player]="'terrain.' + playerTerrain" [title]='playerTerrain'
-                              [terrainCol]='settings.width'
+    <div class="terrain-wrapper enemy-terrain-wrapper">
+      <ng-container *ngIf="playerList$ | async as playerList">
+        <div *ngFor="let playerTerrain of playerList" class="enemy-terrain">
+          <red-tetris-terrain
+            [player]="'terrain.' + playerTerrain"
+            [title]="playerTerrain"
+            [terrainCol]="settings.width"
           ></red-tetris-terrain>
         </div>
       </ng-container>
     </div>
-    <div class='terrain-wrapper main-wrapper'>
-      <div [ngStyle]="{'width': '400px'}">
-        <red-tetris-terrain [player]="'terrain.' + profile.name" [terrainCol]='settings.width'></red-tetris-terrain>
+    <div class="terrain-wrapper main-wrapper">
+      <div [ngStyle]="{ width: '400px' }">
+        <red-tetris-terrain
+          [player]="'terrain.' + profile.name"
+          [terrainCol]="settings.width"
+        ></red-tetris-terrain>
       </div>
-      <div class='info-wrapper'>
+      <div class="info-wrapper">
         <red-tetris-info-widget></red-tetris-info-widget>
-        <div [ngStyle]="{'width': '100px'}">
-          <red-tetris-terrain [player]="'pieceSerial.update'" [terrainCol]='settings.previewRow'></red-tetris-terrain>
+        <div [ngStyle]="{ width: '100px' }">
+          <red-tetris-terrain
+            [player]="'pieceSerial.update'"
+            [terrainCol]="settings.previewRow"
+            [border]="'0'"
+          ></red-tetris-terrain>
         </div>
       </div>
     </div>

@@ -1,15 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 :root {
   --terrainRow: 21;
   --terrainCol: 12;
   --defaultCollor: green;
   --color: blue;
+  --background: #fff;
+  --border: 5px;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+}
 
 .start-button {
   display: flex;
@@ -23,8 +32,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   text-align: center;
   text-shadow: 2px 2px 2px rgb(0 0 0 / 50%);
   background: linear-gradient(
-      176deg
-    , #a20d0d, #ba1313 44%, #3cb52e 57%, #ccefb1);
+    176deg,
+    #a20d0d,
+    #ba1313 44%,
+    #3cb52e 57%,
+    #ccefb1
+  );
   padding: 2rem 0;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

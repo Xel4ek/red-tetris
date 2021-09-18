@@ -13,6 +13,7 @@ import { HelpComponent } from './help/help.component';
 import { WebsocketModule } from '../../core/services/websocket/websocket.module';
 import { environment } from '../../../environments/environment';
 import { SecureModule } from '../../core/directives/secure/secure.module';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SecureModule } from '../../core/directives/secure/secure.module';
     MatExpansionModule,
     SecureModule,
     MatButtonModule,
+    MatIconModule,
   ],
 })
 export class GameModule {}

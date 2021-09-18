@@ -11,14 +11,12 @@ import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext } from '@nestjs/common';
 import { RegisterGameDto } from './dto/register-game.dto';
 import { ValidateDto } from './dto/validate.dto';
-import { PlayerDto, Role } from './dto/player.dto';
 import { RoomDto } from './dto/room.dto';
 
 describe('GameService', () => {
   let service: GameService;
   let roomRepositoryService: RoomRepositoryService;
   let playerRepositoryService: PlayerRepositoryService;
-  let eventEmitter: EventEmitter2;
   let scoreEntityRepository: Repository<ScoreEntity>;
   let channel: WebSocket;
   const room = 'testRoom';
@@ -50,10 +48,7 @@ describe('GameService', () => {
     );
     const mock = createMock<ExecutionContext>();
     channel = mock.switchToWs().getClient<WebSocket>();
-    eventEmitter = moduleRef.get<EventEmitter2>(EventEmitter2);
-    playerRepositoryService.push(
-      new PlayerDto(room, player, Role.ADMIN, channel, eventEmitter)
-    );
+    moduleRef.get<EventEmitter2>(EventEmitter2);
   });
 
   it('should be defined', () => {

@@ -16,9 +16,24 @@
     <mat-expansion-panel *ngFor="let player of players">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          {{ player }}
+          {{ player.name }}
         </mat-panel-title>
+        <mat-panel-description>
+          {{ roleName[player.role] }}
+        </mat-panel-description>
       </mat-expansion-panel-header>
+      <div class="info">
+        <div>Single Player:</div>
+        <div>
+          <mat-icon svgIcon="single" class="icon single"></mat-icon>
+          {{ player.score }}
+        </div>
+        <div>Multi Player:</div>
+        <div>
+          <mat-icon svgIcon="swords" class="icon multi"></mat-icon>
+          {{ player.pvp }}
+        </div>
+      </div>
     </mat-expansion-panel>
   </mat-accordion>
   <ng-container *ngIf="!profile.inGame">
@@ -33,9 +48,15 @@
     </div>
     <div class="start-button">
       <button routerLink="/" mat-raised-button color="primary">Quit</button>
-      <button routerLink="/leaderboards" mat-raised-button color="primary">
+      <a
+        mat-button
+        href="/leaderboards"
+        mat-raised-button
+        color="primary"
+        target="_blank"
+      >
         Leaderboards
-      </button>
+      </a>
     </div>
   </ng-container>
 </div>

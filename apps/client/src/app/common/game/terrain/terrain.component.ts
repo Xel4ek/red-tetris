@@ -35,6 +35,9 @@ export class TerrainComponent implements AfterViewInit {
   @HostBinding('style.--terrainCol')
   @Input()
   terrainCol!: number;
+  @HostBinding('style.--border')
+  @Input()
+  border = '5px';
   @ViewChild('container')
   private readonly elementRef!: ElementRef;
   @HostBinding('style.--size')

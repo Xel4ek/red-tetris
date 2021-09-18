@@ -26,8 +26,7 @@ export class GameService {
     private readonly leaderboardsRepository: LeaderboardsRepositoryService,
     @InjectRepository(ScoreEntity)
     private scoreRepository: Repository<ScoreEntity>
-  ) {
-  }
+  ) {}
 
   startGame(client: WebSocket) {
     const roomName = this.playerRepository.findByChannel(client).room;
@@ -94,8 +93,9 @@ export class GameService {
         event: 'playersList',
         data: this.playerRepository.findByRoom(room).map((pl) => ({
           name: pl.name,
-          score: pl.scoreSingle,
-          pvp: pl.scoreMulti,
+          score: pl.scoreSingle ?? 0,
+          pvp: pl.scoreMulti ?? 0,
+          role: pl.role,
         })),
       })
     );
@@ -123,10 +123,15 @@ export class GameService {
     const player = this.playerRepository.findByChannel(client);
     player._terrain.move(direction);
   }
-
+  pieceDrop(client: WebSocket): void {
+    const player = this.playerRepository.findByChannel(client);
+    player._terrain.drop();
+  }
   @OnEvent('game.stop')
   async gameStop(roomName: string) {
-    const players = this.playerRepository.findByRoom(roomName).filter(pl => pl.role >= Role.PLAYER);
+    const players = this.playerRepository
+      .findByRoom(roomName)
+      .filter((pl) => pl.role >= Role.PLAYER);
     const player = players.find((pl) => pl.status === GameStatus.WINNER);
     const scoreEntity = (await this.scoreRepository.findOne({
       player: player.name,
@@ -151,13 +156,19 @@ export class GameService {
       );
     }
     await this.scoreRepository.save(scoreEntity);
-    this.leaderboardsRepository.getTop().pipe(first(), map(top => {
-      const update = top.find(el => el.score < player.scoreSingle ||
-      el.pvp < player.scoreMulti);
-      if (update) {
-        this.eventEmitter.emit('game.update_top');
-      }
-    }))
+    this.leaderboardsRepository
+      .getTop()
+      .pipe(
+        first(),
+        map((top) => {
+          const update = top.find(
+            (el) => el.score < player.scoreSingle || el.pvp < player.scoreMulti
+          );
+          if (update) {
+            this.eventEmitter.emit('game.update_top');
+          }
+        })
+      )
       .subscribe();
     console.log('stop game in room, winner: ', player);
   }
