@@ -63,4 +63,24 @@ describe('GameControlService', () => {
     service.move('r');
     expect(webSocket.send).toBeCalled();
   });
+  it('GameControlService drop', () => {
+    service.drop();
+    expect(webSocket.send).toBeCalled();
+  });
+  it('methods', () => {
+    expect(service.room()).toBeTruthy();
+    expect(service.playersList()).toBeTruthy();
+    expect(service.piecePreview()).toBeTruthy();
+    expect(service.status()).toBeTruthy();
+    expect(service.settings()).toBeTruthy();
+    expect(service.info()).toBeTruthy();
+    expect(service.validation()).toBeTruthy();
+    expect(service.player()).toBeTruthy();
+    expect(
+      service.httpValidation({
+        lobby: 'test lobby',
+        name: 'test name',
+      })
+    ).toBeTruthy();
+  });
 });
