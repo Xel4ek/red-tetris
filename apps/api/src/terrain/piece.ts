@@ -10,7 +10,7 @@ export enum Pieces {
 export class Piece {
   private piece: boolean[];
   size: number;
-  private static readonly pieceList: Readonly<Record<Pieces, boolean[]>> = {
+  static readonly pieceList: Readonly<Record<Pieces, boolean[]>> = {
     I: [
       false,
       false,

@@ -16,13 +16,13 @@ export class Terrain {
       .map(() => clone.splice(0, Terrain.width));
   }
 
-  private static empty = '#ffffff';
+  static empty = '#ffffff';
   private static preview = '#6766669E';
   private static baseScore = 100;
   private static previewRow = 6;
   private static levelUpRows = 10;
   private static width = 10;
-  private static height = 20;
+  static height = 20;
   static border = '#b0b0b0';
   private _terrain: string[];
   terrain2D: string[][];
