@@ -78,7 +78,6 @@ export class Terrain {
   }
 
   missRow(rows: number) {
-    console.log('row:' + rows);
     if (
       this.terrain
         .slice(0, rows * Terrain.width)
@@ -173,7 +172,6 @@ export class Terrain {
   stop() {
     this.inGame = false;
     this.share();
-    console.log('game stop');
     this.destroy$.next();
     this.destroy$.complete();
   }

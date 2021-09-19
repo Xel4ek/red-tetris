@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RegisterGameDto } from './dto/register-game.dto';
-import { GameStatus, PlayerDto, Role } from './dto/player.dto';
+import { GameStatus, Player, Role } from '../player/player';
 import { WsMessage } from './dto/message.dto';
 import { RoomDto } from './dto/room.dto';
 import { ProfileDto } from './dto/profile.dto';
@@ -74,7 +74,7 @@ export class GameService {
         role = Role.SPECTRAL;
       }
     }
-    const registeredPlayer = new PlayerDto(
+    const registeredPlayer = new Player(
       room,
       player,
       role,
@@ -148,7 +148,7 @@ export class GameService {
         })
       );
     }
-    await this.scoreRepository.save(scoreEntity).catch(console.log);
+    await this.scoreRepository.save(scoreEntity);
     this.playerListMulticast(player.room);
     this.leaderboardsRepository
       .getTop()
@@ -164,7 +164,7 @@ export class GameService {
         })
       )
       .subscribe();
-    console.log('stop game in room, winner: ', player);
+    // console.log('stop game in room, winner: ', player);
   }
 
   leaderboards(): Observable<WsMessage<LeaderboardsDto[]>> {

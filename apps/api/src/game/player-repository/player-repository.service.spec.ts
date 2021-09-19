@@ -1,38 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerRepositoryService } from './player-repository.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { createMock } from '@golevelup/ts-jest';
-import { ExecutionContext } from '@nestjs/common';
-import { PlayerDto } from '../dto/player.dto';
+import { GameStatus, Player } from '../../player/player';
 import { Terrain } from '../terrain/terrain';
 import { PieceGenerator } from '../../terrain/piece';
 
 describe('PlayerRepositoryService', () => {
   let service: PlayerRepositoryService;
-  let adminPlayer: PlayerDto;
-  let channel: WebSocket;
-  let terrain: Terrain;
-  let pieceGenerator: PieceGenerator;
-  let eventEmitter2: EventEmitter2;
+  let eventEmitter2: Partial<EventEmitter2>;
 
   beforeEach(async () => {
+    eventEmitter2 = {
+      emit: jest.fn(),
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PlayerRepositoryService,
-        EventEmitter2,
-        PieceGenerator,
-        PlayerDto,
+        { provide: EventEmitter2, useValue: eventEmitter2 },
       ],
     }).compile();
 
     service = module.get<PlayerRepositoryService>(PlayerRepositoryService);
-    pieceGenerator = module.get<PieceGenerator>(PieceGenerator);
-    eventEmitter2 = module.get<EventEmitter2>(EventEmitter2);
-    const mock = createMock<ExecutionContext>();
-    channel = mock.switchToWs().getClient<WebSocket>();
-    // adminPlayer = new PlayerDto('testRoom', 'testPlayer', Role.ADMIN, channel, eventEmitter2);
-    service.push(adminPlayer);
-    terrain = new Terrain(eventEmitter2, pieceGenerator);
   });
 
   it('should be defined', () => {
@@ -40,23 +28,89 @@ describe('PlayerRepositoryService', () => {
   });
 
   it('should add Player', function () {
-    expect(service.push(adminPlayer)).toBeUndefined();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const add = jest.spyOn(service.store, 'push');
+    service.push({} as Player);
+    expect(add).toBeCalled();
+  });
+  it('should filter Player', function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const filter = jest.spyOn(service.store, 'filter');
+    service.findByRoom('testRoom');
+    expect(filter).toBeCalled();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    jest.spyOn(service, 'findByChannel').mockImplementation(() => ({
+      channels: [{} as WebSocket],
+    }));
+    service.removeByChannel({} as WebSocket);
+
+    expect(filter).toBeCalled();
   });
 
-  // it('functions should be defined', function () {
-  //   expect(service.findByRoom('')).toBeDefined();
-  // });
-  //
-  // it('should ', function () {
-  //   expect(service.findByName('')).not.toBeDefined();
-  // });
-  //
-  // it('should ', function () {
-  //   expect(service.removeByChannel(channel)).toBeUndefined();
-  // });
+  it('should find', function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const find = jest.spyOn(service.store, 'find');
+    service.findByName('testName');
+    expect(find).toBeCalled();
+    service.findByTerrain({} as Terrain);
+    expect(find).toBeCalled();
+    service.findByChannel({} as WebSocket);
+    expect(find).toBeCalled();
+  });
 
-  it('push test user', function () {
-    expect(service.push(adminPlayer)).toBeUndefined();
+  it('should terrainOverflow', () => {
+    const terrain = new Terrain(new EventEmitter2(), new PieceGenerator());
+    const stop = jest.spyOn(terrain, 'stop');
+    service.terrainOverflow(terrain);
+    expect(stop).toBeCalled();
+
+    const loser = jest.fn();
+    jest.spyOn(service, 'findByTerrain').mockImplementation(
+      () =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        ({
+          room: 'testRoom',
+          loser,
+          winner: jest.fn(),
+        } as Player)
+    );
+    jest.spyOn(service, 'findByRoom').mockImplementation(() => [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      {
+        status: GameStatus.ACTIVE,
+        loser,
+        winner: jest.fn(),
+      } as Player,
+    ]);
+
+    service.terrainOverflow(terrain);
+    expect(loser).toBeCalled();
+  });
+
+  it('pieceSerialUpdate', function () {
+    const terrain = {
+      stop: jest.fn(),
+    };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    service.pieceSerialUpdate(terrain, []);
+    expect(terrain.stop).toBeCalled();
+    const player = {
+      send: jest.fn(),
+    };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    jest.spyOn(service, 'findByTerrain').mockImplementation(() => player);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    service.pieceSerialUpdate(terrain, []);
+    expect(player.send).toBeCalled();
   });
 
   // it('should return user by terrain', function () {

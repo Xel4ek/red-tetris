@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Terrain } from "./terrain";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { PieceGenerator } from "../../terrain/piece";
+import { Terrain } from './terrain';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PieceGenerator } from '../../terrain/piece';
 
 describe('Terrain', () => {
   let terrain: Terrain;
@@ -39,7 +39,7 @@ describe('Terrain', () => {
 
   it('should move', function () {
     terrain.start();
-    console.log(terrain.status());
+    // console.log(terrain.status());
     expect(terrain.move('d')).toBeDefined();
     expect(terrain.move('l')).toBeDefined();
     expect(terrain.move('l')).toBeDefined();

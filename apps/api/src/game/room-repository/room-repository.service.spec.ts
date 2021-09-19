@@ -2,7 +2,7 @@ import { RoomRepositoryService } from './room-repository.service';
 import { Test } from '@nestjs/testing';
 import { PlayerRepositoryService } from '../player-repository/player-repository.service';
 import { RoomDto } from '../dto/room.dto';
-import { GameStatus, Role } from '../dto/player.dto';
+import { GameStatus, Role } from '../../player/player';
 import { Terrain } from '../terrain/terrain';
 
 describe('RoomRepositoryService', () => {

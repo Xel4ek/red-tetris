@@ -1,8 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Terrain } from '../terrain/terrain';
-import { PieceGenerator } from '../../terrain/piece';
+import { Terrain } from '../game/terrain/terrain';
+import { PieceGenerator } from '../terrain/piece';
 import { Repository } from 'typeorm';
-import { ScoreEntity } from '../entities/score.entity';
+import { ScoreEntity } from '../game/entities/score.entity';
 
 export enum Role {
   ANTONYMOUS,
@@ -18,7 +18,7 @@ export enum GameStatus {
   WINNER,
 }
 
-export class PlayerDto {
+export class Player {
   name: string;
   channels: WebSocket[];
   room: string;
@@ -54,16 +54,13 @@ export class PlayerDto {
   }
 
   gameStop(): void {
-    console.log('game stop ', this);
+    // console.log('game stop ', this);
   }
 
   gameStart(pieceGenerator: PieceGenerator): void {
     this.status = GameStatus.ACTIVE;
     this._terrain = new Terrain(this.eventEmitter, pieceGenerator);
     this._terrain.start();
-
-    // console.log(this.eventEmitter);
-    // console.log('game start ', this.name);
   }
 
   winner() {

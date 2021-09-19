@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
-import { GameStatus, PlayerDto } from '../dto/player.dto';
+import { GameStatus, Player } from '../../player/player';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Terrain } from '../terrain/terrain';
 
 @Injectable()
 export class PlayerRepositoryService {
   constructor(private readonly eventEmitter: EventEmitter2) {}
-  private store: PlayerDto[] = [];
-  findByName(name: string): PlayerDto | undefined {
+  private store: Player[] = [];
+  findByName(name: string): Player | undefined {
     return this.store.find((player) => player.name === name);
   }
   findByRoom(room: string) {
@@ -17,12 +17,12 @@ export class PlayerRepositoryService {
   findByTerrain(terrain: Terrain) {
     return this.store.find((pl) => pl._terrain === terrain);
   }
-  findByChannel(channel: WebSocket): PlayerDto | undefined {
+  findByChannel(channel: WebSocket): Player | undefined {
     return this.store.find((player) =>
       player.channels.find((c) => c === channel)
     );
   }
-  push(player: PlayerDto): void {
+  push(player: Player): void {
     this.store.push(player);
   }
   removeByChannel(channel: WebSocket) {
@@ -42,7 +42,7 @@ export class PlayerRepositoryService {
     if (player) {
       const players = this.findByRoom(player.room);
       let otherPlayers = 0;
-      let winner: PlayerDto;
+      let winner: Player;
       players.map((pl) => {
         if (pl !== player && pl.status === GameStatus.ACTIVE) {
           ++otherPlayers;

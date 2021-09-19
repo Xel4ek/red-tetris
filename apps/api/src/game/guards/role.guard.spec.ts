@@ -2,7 +2,7 @@ import { RoleGuard } from './role.guard';
 import { PlayerRepositoryService } from '../player-repository/player-repository.service';
 import { ExecutionContext } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
-import { Role } from '../dto/player.dto';
+import { Role } from '../../player/player';
 
 describe('RoleGuard', () => {
   let playerRepositoryService: Partial<PlayerRepositoryService>;

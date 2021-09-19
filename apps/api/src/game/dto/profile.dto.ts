@@ -1,4 +1,4 @@
-import { Role } from './player.dto';
+import { Role } from '../../player/player';
 
 export class ProfileDto {
   role: Role;

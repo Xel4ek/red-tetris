@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Role } from '../dto/player.dto';
+import { Role } from '../../player/player';
 import { PlayerRepositoryService } from '../player-repository/player-repository.service';
 
 @Injectable()

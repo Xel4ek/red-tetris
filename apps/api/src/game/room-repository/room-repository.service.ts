@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RoomDto } from '../dto/room.dto';
 import { PlayerRepositoryService } from '../player-repository/player-repository.service';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Role } from '../dto/player.dto';
+import { Role } from '../../player/player';
 import { Terrain } from '../terrain/terrain';
 import { PieceGenerator } from '../../terrain/piece';
 
