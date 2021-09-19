@@ -17,11 +17,10 @@ const getOptions = (): TypeOrmModuleOptions => {
     return {
       ...connectionOptions,
       url: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false,
-      },
       extra: {
-        ssl: true,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       },
     };
   } else {
