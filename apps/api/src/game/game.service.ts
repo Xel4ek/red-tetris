@@ -100,9 +100,9 @@ export class GameService {
     this.playerListMulticast(room);
   }
 
-  pieceRotate(client: WebSocket, direction: 'l' | 'r'): void {
+  pieceRotate(client: WebSocket): void {
     const player = this.playerRepository.findByChannel(client);
-    player._terrain.rotate(direction);
+    player._terrain.rotate();
   }
 
   pieceMove(client: WebSocket, direction: 'l' | 'r' | 'd'): void {

@@ -12,6 +12,9 @@ import { ExecutionContext } from '@nestjs/common';
 import { RegisterGameDto } from './dto/register-game.dto';
 import { ValidateDto } from './dto/validate.dto';
 import { RoomDto } from './dto/room.dto';
+import { firstValueFrom, of } from 'rxjs';
+import { LeaderboardsDto } from './dto/leaderboards.dto';
+import { GameStatus, Role } from '../player/player';
 
 describe('GameService', () => {
   let service: GameService;
@@ -21,7 +24,8 @@ describe('GameService', () => {
   let channel: WebSocket;
   const room = 'testRoom';
   const player = 'testPlayer';
-
+  let leaderboardsRepository: Partial<LeaderboardsRepositoryService>;
+  let eventEmitter: Partial<EventEmitter2>;
   beforeEach(async () => {
     scoreEntityRepository = {
       findOne: jest
@@ -60,6 +64,10 @@ describe('GameService', () => {
     const mock = createMock<ExecutionContext>();
     channel = mock.switchToWs().getClient<WebSocket>();
     moduleRef.get<EventEmitter2>(EventEmitter2);
+    leaderboardsRepository = moduleRef.get<LeaderboardsRepositoryService>(
+      LeaderboardsRepositoryService
+    );
+    eventEmitter = moduleRef.get<EventEmitter2>(EventEmitter2);
   });
 
   it('should be defined', () => {
@@ -115,8 +123,8 @@ describe('GameService', () => {
           rotate,
         },
       }));
-    service.pieceRotate({} as WebSocket, 'r');
-    expect(rotate).toBeCalledWith('r');
+    service.pieceRotate({} as WebSocket);
+    expect(rotate).toBeCalled();
   });
 
   it('should startGame method', () => {
@@ -167,5 +175,82 @@ describe('GameService', () => {
       },
       event: 'error',
     });
+  });
+  it('pieceDrop', () => {
+    const drop = jest.fn();
+    jest
+      .spyOn(playerRepositoryService, 'findByChannel')
+      .mockImplementation(() => ({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        _terrain: {
+          drop,
+        },
+      }));
+    service.pieceDrop({} as WebSocket);
+    expect(drop).toBeCalled();
+  });
+
+  it('should leaderboards', (done) => {
+    const getTop = jest
+      .spyOn(leaderboardsRepository, 'getTop')
+      .mockImplementation(() => of([{} as LeaderboardsDto]));
+    service.leaderboards().subscribe((data) => {
+      expect(data).toEqual({ data: [{}], event: 'leaderboards' });
+      expect(getTop).toBeCalled();
+      done();
+    });
+  });
+
+  it('should gameStop', async () => {
+    const send = jest.fn();
+    const findByRoom = jest
+      .spyOn(playerRepositoryService, 'findByRoom')
+      .mockImplementation(
+        () =>
+          [
+            {
+              name: 'winner',
+              status: GameStatus.WINNER,
+              role: Role.ADMIN,
+              send,
+            },
+            {
+              name: 'loser',
+              status: GameStatus.LOSER,
+              role: Role.PLAYER,
+              send,
+            },
+          ] as never
+      );
+    const findOne = jest
+      .spyOn(scoreEntityRepository, 'findOne')
+      .mockImplementation(() =>
+        firstValueFrom(
+          of({
+            player: 'winner',
+            scoreSingle: BigInt(42),
+            scoreMulti: BigInt(21),
+          })
+        )
+      );
+    const save = jest
+      .spyOn(scoreEntityRepository, 'save')
+      .mockImplementation(() => firstValueFrom(of(true as never)));
+
+    const emitter = jest.spyOn(eventEmitter, 'emit');
+    jest.spyOn(leaderboardsRepository, 'getTop').mockImplementation(() =>
+      of([
+        {
+          score: 0,
+          pvp: 0,
+        } as LeaderboardsDto,
+      ])
+    );
+    await service.gameStop('testRoom');
+    expect(save).toBeCalled();
+    expect(findByRoom).toBeCalled();
+    expect(findOne).toBeCalled();
+    expect(emitter).toBeCalledWith('game.updateTop');
   });
 });

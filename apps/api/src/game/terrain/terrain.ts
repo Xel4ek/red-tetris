@@ -87,20 +87,19 @@ export class Terrain {
         ...this.terrain.slice(rows * Terrain.width),
         ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
       ];
-
     } else {
       this.eventEmitter.emit('terrain.overflow', this);
       this.share();
     }
   }
 
-  rotate(direction: 'r' | 'l'): Terrain {
+  rotate(): Terrain {
     if (!this.inGame) return this;
-    this.piece.rotate(direction);
+    this.piece.rotate();
     if (!this.validate()) {
-      this.piece.rotate(direction === 'r' ? 'l' : 'r');
-      this.piece.rotate(direction === 'r' ? 'l' : 'r');
-      this.piece.rotate(direction === 'r' ? 'l' : 'r');
+      this.piece.rotate();
+      this.piece.rotate();
+      this.piece.rotate();
     } else {
       this.share();
     }
@@ -133,7 +132,7 @@ export class Terrain {
     return this;
   }
   drop() {
-    for(;;) {
+    for (;;) {
       const posY = this.y;
       this.y += 1;
       if (!this.validate()) {

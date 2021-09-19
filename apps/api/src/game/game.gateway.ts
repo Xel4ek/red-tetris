@@ -52,11 +52,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('pieceRotate')
-  pieceRotate(
-    @MessageBody() direction: 'l' | 'r',
-    @ConnectedSocket() client: WebSocket
-  ) {
-    this.gameService.pieceRotate(client, direction);
+  pieceRotate(@ConnectedSocket() client: WebSocket) {
+    this.gameService.pieceRotate(client);
   }
   @SubscribeMessage('pieceMove')
   pieceMove(

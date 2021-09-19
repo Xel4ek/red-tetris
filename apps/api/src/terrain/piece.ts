@@ -41,8 +41,7 @@ export class Piece {
     this.size = Math.sqrt(this.piece.length);
   }
 
-  rotate(direction: 'r' | 'l') {
-    //TODO: Rotation not fully implemented
+  rotate() {
     const piece = new Array(this.size * this.size);
     for (let i = 0; i < this.piece.length; ++i) {
       const row = Math.trunc(i / this.size);

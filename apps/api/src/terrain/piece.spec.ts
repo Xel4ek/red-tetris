@@ -1,11 +1,11 @@
-import { Piece, Pieces } from "./piece";
+import { Piece, Pieces } from './piece';
 
 describe('Piece', () => {
   let piece: Piece;
 
   beforeEach(() => {
     piece = new Piece(Pieces.LL);
-  })
+  });
 
   it('should be defined', () => {
     expect(piece).toBeDefined();
@@ -17,17 +17,16 @@ describe('Piece', () => {
 
   it('rotate should change shape', function () {
     const oldShape = piece.show();
-    piece.rotate('r');
+    piece.rotate();
     expect(piece.show()).not.toEqual(oldShape);
   });
 
   it('4 rotates should be equal to start shape', function () {
     const oldShape = piece.show();
-    piece.rotate('r');
-    piece.rotate('r');
-    piece.rotate('r');
-    piece.rotate('r');
+    piece.rotate();
+    piece.rotate();
+    piece.rotate();
+    piece.rotate();
     expect(piece.show()).toEqual(oldShape);
   });
-
 });
