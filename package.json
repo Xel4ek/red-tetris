@@ -1,6 +1,6 @@
 {
   "name": "red-tetris",
-  "version": "1.0.0",
+  "version": "3.1.0",
   "license": "MIT",
   "scripts": {
     "ng": "nx",
@@ -10,7 +10,7 @@
     "start:dev:db": " ./apps/api/src/scripts/start-db.sh",
     "start": "ng serve",
     "build": "nx run api:build:production && nx run client:build:production",
-    "test": "nx run-many --all --target=test --detectOpenHandles",
+    "test": "nx run-many --all --target=test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
     "affected:apps": "nx affected:apps",
