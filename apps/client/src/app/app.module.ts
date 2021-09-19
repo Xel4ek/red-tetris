@@ -12,6 +12,7 @@ import { SecureModule } from './core/directives/secure/secure.module';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WelcomeComponent } from './common/welcome/welcome.component';
+import { windowToken } from './core/tokens/window.token';
 
 @NgModule({
   declarations: [AppComponent, WelcomeComponent],
@@ -26,7 +27,12 @@ import { WelcomeComponent } from './common/welcome/welcome.component';
     MatInputModule,
     ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: windowToken,
+      useValue: window,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

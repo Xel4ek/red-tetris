@@ -1,13 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerRepositoryService } from './player-repository.service';
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { createMock } from "@golevelup/ts-jest";
-import { ExecutionContext } from "@nestjs/common";
-import { PlayerDto, Role } from "../dto/player.dto";
-import { channel } from "diagnostics_channel";
-import { Terrain } from "../terrain/terrain";
-import { Piece, PieceGenerator } from "../../terrain/piece";
-import { T } from "@angular/cdk/keycodes";
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { createMock } from '@golevelup/ts-jest';
+import { ExecutionContext } from '@nestjs/common';
+import { PlayerDto } from '../dto/player.dto';
+import { Terrain } from '../terrain/terrain';
+import { PieceGenerator } from '../../terrain/piece';
 
 describe('PlayerRepositoryService', () => {
   let service: PlayerRepositoryService;
@@ -19,15 +17,20 @@ describe('PlayerRepositoryService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PlayerRepositoryService, EventEmitter2, PieceGenerator, PlayerDto],
+      providers: [
+        PlayerRepositoryService,
+        EventEmitter2,
+        PieceGenerator,
+        PlayerDto,
+      ],
     }).compile();
 
     service = module.get<PlayerRepositoryService>(PlayerRepositoryService);
     pieceGenerator = module.get<PieceGenerator>(PieceGenerator);
     eventEmitter2 = module.get<EventEmitter2>(EventEmitter2);
     const mock = createMock<ExecutionContext>();
-    channel = mock.switchToWs().getClient<WebSocket>()
-    adminPlayer = new PlayerDto('testRoom', 'testPlayer', Role.ADMIN, channel, eventEmitter2);
+    channel = mock.switchToWs().getClient<WebSocket>();
+    // adminPlayer = new PlayerDto('testRoom', 'testPlayer', Role.ADMIN, channel, eventEmitter2);
     service.push(adminPlayer);
     terrain = new Terrain(eventEmitter2, pieceGenerator);
   });
@@ -42,7 +45,6 @@ describe('PlayerRepositoryService', () => {
 
   it('functions should be defined', function () {
     expect(service.findByRoom('')).toBeDefined();
-
   });
 
   it('should ', function () {
@@ -70,5 +72,4 @@ describe('PlayerRepositoryService', () => {
   it('should pieceSerialUpdate', function () {
     expect(service.pieceSerialUpdate(adminPlayer._terrain, [])).toBeUndefined();
   });
-
 });
