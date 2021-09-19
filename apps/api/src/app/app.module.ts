@@ -10,7 +10,7 @@ const getOptions = (): TypeOrmModuleOptions => {
   const connectionOptions: Partial<TypeOrmModuleOptions> = {
     type: 'postgres',
     logging: false,
-    synchronize: false,
+    synchronize: true,
     entities: [ScoreEntity],
   };
   if (process.env.DATABASE_URL) {
