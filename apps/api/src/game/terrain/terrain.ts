@@ -270,7 +270,6 @@ export class Terrain {
   }
 
   private validate(): boolean {
-    //TODO: fix rotation at sides
     return this.piece.show().every((value, idx) => {
       const posX = this.x + (idx % this.piece.size);
       const posY = this.y + Math.trunc(idx / this.piece.size);

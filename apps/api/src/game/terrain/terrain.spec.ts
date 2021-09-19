@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Terrain } from './terrain';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Piece, PieceGenerator } from '../../terrain/piece';
-import { last } from "rxjs";
 
 describe('Terrain', () => {
   let terrain: Terrain;
@@ -20,7 +19,9 @@ describe('Terrain', () => {
 
   it('should drop', () => {
     terrain.drop();
-    expect(terrain.terrain2D.slice(-1)[0].some(value => value !== Terrain.empty)).toBeTruthy();
+    expect(
+      terrain.terrain2D.slice(-1)[0].some((value) => value !== Terrain.empty)
+    ).toBeTruthy();
   });
 
   it('should move left', () => {
@@ -48,10 +49,25 @@ describe('Terrain', () => {
     const piece = terrain.piece.show();
     terrain.start();
     terrain.rotate();
-    if (!terrain.piece.show().every((value, idx) => value === Piece.pieceList.S[idx]))
-      expect(terrain.piece.show().some((value, idx) => value != piece[idx])).toBeTruthy();
-  });
 
+    if (
+      !terrain.piece
+        .show()
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        .every((value, idx) => value === Piece.pieceList.S[idx])
+    )
+      expect(
+        terrain.piece.show().some((value, idx) => value != piece[idx])
+      ).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    jest.spyOn(terrain, 'validate').mockImplementation(() => false);
+    const rotate = jest.spyOn(terrain.piece, 'rotate');
+    terrain.start();
+    terrain.rotate();
+    expect(rotate).toBeCalledTimes(4);
+  });
 
   it('updateScore should be undefined', () => {
     expect(terrain.updateScore(1)).toBeUndefined();
