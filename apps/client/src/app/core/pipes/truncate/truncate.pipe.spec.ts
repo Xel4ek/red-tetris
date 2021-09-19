@@ -9,4 +9,8 @@ describe('TruncatePipe', () => {
   it('truncate "more then max"', () => {
     expect(pipe.transform('so long', 2)).toEqual('so...');
   });
+
+  it('truncate no string', () => {
+    expect(pipe.transform(123, 2)).toEqual(123);
+  });
 });

@@ -60,7 +60,7 @@ export class MainComponent implements OnDestroy {
         map((fr) => {
           if (fr === null || !fr.endsWith(']')) {
             this.title.setTitle('Red Tetris: Error');
-            return true;
+            return;
           }
           const index = fr.search(/\[|%5B/);
           if (index <= 0) return true;
@@ -69,10 +69,10 @@ export class MainComponent implements OnDestroy {
           if (name?.length && lobby?.length) {
             gameControlService.register(lobby, name);
             this.title.setTitle('Red Tetris: ' + lobby);
-            return false;
+            return;
           } else {
             this.title.setTitle('Red Tetris: Error');
-            return true;
+            return;
           }
         }),
         tap((result) => {

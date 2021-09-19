@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { GameStatus, TerrainService } from './terrain.service';
 import { WebsocketService } from '../../../core/services/websocket/websocket.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 describe('TerrainService', () => {
   let service: TerrainService;
@@ -33,10 +33,6 @@ describe('TerrainService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('terrain create', () => {
-    service.subscribe('Test Name');
-    expect(service.terrain()).toBeDefined();
-  });
   it('terrain status', () => {
     service.subscribe('TestName');
     service
@@ -45,6 +41,17 @@ describe('TerrainService', () => {
   });
 
   it('terrain throw error', () => {
-    expect(service.terrain).toThrow(Error);
+    expect(() => service.terrain()).toThrow('terrain$ is not initialize!');
+  });
+
+  it('terrain observer', () => {
+    jest.spyOn(webSocket, 'on').mockImplementation(() =>
+      of({
+        terrain: ['1'],
+        status: 1,
+      })
+    );
+    service.subscribe('testName');
+    service.terrain().subscribe((data) => expect(data).toEqual(['1']));
   });
 });

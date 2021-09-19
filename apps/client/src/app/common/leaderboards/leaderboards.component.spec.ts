@@ -10,7 +10,7 @@ describe('LeaderboardsComponent', () => {
   let fixture: ComponentFixture<LeaderboardsComponent>;
   beforeEach(async () => {
     webService = {
-      on(event: string): Observable<any> {
+      on(): Observable<any> {
         return of([
           {
             name: 'test',
@@ -36,5 +36,15 @@ describe('LeaderboardsComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+  it('should be add index', () => {
+    component.leaderboards$.subscribe((data) =>
+      expect(data).toEqual({
+        position: 1,
+        name: 'test',
+        pvp: 0,
+        score: 1,
+      })
+    );
   });
 });

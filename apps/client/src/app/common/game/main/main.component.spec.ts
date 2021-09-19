@@ -3,10 +3,12 @@ import { MainComponent } from './main.component';
 import { GameControlService } from '../../../core/services/game-control/game-control.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileService } from '../../../core/services/profile/profile.service';
-import { of } from 'rxjs';
+import { from, of } from 'rxjs';
 import { Role } from '../../../core/interfaces/role';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { WelcomeComponent } from '../../welcome/welcome.component';
+import { Title } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 describe('MainComponent', () => {
   let fixture: ComponentFixture<MainComponent>;
@@ -14,7 +16,15 @@ describe('MainComponent', () => {
 
   let gameService: Partial<GameControlService>;
   let profileService: Partial<ProfileService>;
-  beforeEach(() => {
+  let title: Partial<Title>;
+  let router: Partial<ActivatedRoute>;
+  beforeEach(async () => {
+    router = {
+      fragment: from(['', 'dad1211', '2[2]', '2[]', '[2]']),
+    };
+    title = {
+      setTitle: jest.fn(),
+    };
     gameService = {
       settings: () =>
         of({
@@ -25,6 +35,7 @@ describe('MainComponent', () => {
         }),
       move: jest.fn(),
       rotate: jest.fn(),
+      drop: jest.fn(),
     };
     profileService = {
       profile: () =>
@@ -35,7 +46,7 @@ describe('MainComponent', () => {
           room: 'testRoom',
         }),
     };
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       declarations: [MainComponent],
       imports: [
         RouterTestingModule.withRoutes([
@@ -53,6 +64,14 @@ describe('MainComponent', () => {
         {
           provide: ProfileService,
           useValue: profileService,
+        },
+        {
+          provide: Title,
+          useValue: title,
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: router,
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
@@ -82,5 +101,15 @@ describe('MainComponent', () => {
     // @ts-ignore
     component.handleKeyboardEvent('KeyS');
     expect(gameService.move).toBeCalledWith('d');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    component.handleKeyboardEvent('Space');
+    expect(gameService.drop).toBeCalled();
+  });
+
+  it('registration', () => {
+    router.fragment = of('2[2]');
+    component.playerList$.subscribe((data) => expect(data).toEqual('2'));
   });
 });

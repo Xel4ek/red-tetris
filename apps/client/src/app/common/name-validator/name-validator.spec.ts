@@ -19,4 +19,15 @@ describe('NameValidator', () => {
 
     expect(result).toEqual(null);
   });
+  it('User not exist', () => {
+    gameControl = {
+      httpValidation: jest.fn().mockImplementation(() => of({ name: false })),
+    };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const validator = NameValidator.occupied(gameControl)({
+      get: () => null,
+    });
+    validator.subscribe((data) => expect(data).toEqual(null));
+  });
 });
