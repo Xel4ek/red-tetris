@@ -57,6 +57,11 @@ export class RoomRepositoryService {
   gameStop(roomName: string) {
     const room = this.getByName(roomName);
     room.inGame = false;
+    this.playerRepository.findByRoom(room.name).map((pl) => {
+      if (pl.role !== Role.ADMIN) {
+        pl.role = Role.PLAYER;
+      }
+    });
     this.profileMulticast(room);
     // console.log('Game stopped at ', room);
   }
@@ -88,7 +93,7 @@ export class RoomRepositoryService {
     }
   }
 
-  disconnect(channel: WebSocket) {
+  disconnect(channel: WebSocket): string {
     const player = this.playerRepository.findByChannel(channel);
     if (!player) return;
     const room = this.findByName(player.room);
@@ -100,19 +105,23 @@ export class RoomRepositoryService {
     const players = this.playerRepository.findByRoom(room.name);
     if (players.length) {
       players[0].role = Role.ADMIN;
-      this.profileMulticast(room);
     } else {
       this.store = this.store.filter((r) => r !== room);
     }
+    this.profileMulticast(room);
+    return room.name;
   }
 
   @OnEvent('terrain.collapseRow')
   collapseRow(terrain: Terrain, miss: number) {
     const player = this.playerRepository.findByTerrain(terrain);
-    this.playerRepository.findByRoom(player.room).filter(pl => pl.role >= Role.PLAYER).map((pl) => {
-      if (pl !== player) {
-        pl._terrain.missRow(miss);
-      }
-    });
+    this.playerRepository
+      .findByRoom(player.room)
+      .filter((pl) => pl.role >= Role.PLAYER)
+      .map((pl) => {
+        if (pl !== player) {
+          pl._terrain.missRow(miss);
+        }
+      });
   }
 }

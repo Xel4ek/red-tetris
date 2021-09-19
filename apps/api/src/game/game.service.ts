@@ -96,7 +96,8 @@ export class GameService {
   }
 
   disconnect(client: WebSocket) {
-    this.roomRepository.disconnect(client);
+    const room = this.roomRepository.disconnect(client);
+    this.playerListMulticast(room);
   }
 
   pieceRotate(client: WebSocket, direction: 'l' | 'r'): void {
