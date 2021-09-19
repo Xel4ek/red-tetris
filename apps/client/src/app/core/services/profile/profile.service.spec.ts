@@ -32,8 +32,21 @@ describe('ProfileService', () => {
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+    expect(service.profile).toBeTruthy();
   });
   it('player returned', () => {
     service.profile().subscribe((data) => expect(data).toEqual(profile));
+  });
+  it('on destroy', () => {
+    const destroy = {
+      next: jest.fn(),
+      complete: jest.fn(),
+    };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    service.destroy$ = destroy;
+    service.ngOnDestroy();
+    expect(destroy.next).toHaveBeenCalled();
+    expect(destroy.complete).toHaveBeenCalled();
   });
 });
