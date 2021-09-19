@@ -74,31 +74,16 @@ export class GameService {
         role = Role.SPECTRAL;
       }
     }
-    this.playerRepository.push(
-      new PlayerDto(
-        room,
-        player,
-        role,
-        client,
-        this.eventEmitter,
-        this.scoreRepository
-      )
-    );
-    this.scoreRepository
-      .save({ room: room, player: player })
-      .catch(console.error);
-    this.roomRepository.multicast(
+    const registeredPlayer = new PlayerDto(
       room,
-      JSON.stringify({
-        event: 'playersList',
-        data: this.playerRepository.findByRoom(room).map((pl) => ({
-          name: pl.name,
-          score: pl.scoreSingle ?? 0,
-          pvp: pl.scoreMulti ?? 0,
-          role: pl.role,
-        })),
-      })
+      player,
+      role,
+      client,
+      this.eventEmitter,
+      this.scoreRepository
     );
+    this.playerRepository.push(registeredPlayer);
+    registeredPlayer.loadFromDB().then(() => this.playerListMulticast(room));
     return {
       event: 'profile',
       data: {
@@ -123,10 +108,12 @@ export class GameService {
     const player = this.playerRepository.findByChannel(client);
     player._terrain.move(direction);
   }
+
   pieceDrop(client: WebSocket): void {
     const player = this.playerRepository.findByChannel(client);
     player._terrain.drop();
   }
+
   @OnEvent('game.stop')
   async gameStop(roomName: string) {
     const players = this.playerRepository
@@ -156,6 +143,7 @@ export class GameService {
       );
     }
     await this.scoreRepository.save(scoreEntity);
+    this.playerListMulticast(player.room);
     this.leaderboardsRepository
       .getTop()
       .pipe(
@@ -165,7 +153,7 @@ export class GameService {
             (el) => el.score < player.scoreSingle || el.pvp < player.scoreMulti
           );
           if (update) {
-            this.eventEmitter.emit('game.update_top');
+            this.eventEmitter.emit('game.updateTop');
           }
         })
       )
@@ -174,6 +162,7 @@ export class GameService {
   }
 
   leaderboards(): Observable<WsMessage<LeaderboardsDto[]>> {
+    this.eventEmitter.emit('game.updateTop');
     return this.leaderboardsRepository.getTop().pipe(
       map((data) => ({
         event: 'leaderboards',
@@ -188,5 +177,20 @@ export class GameService {
       lobby: !!this.roomRepository.findByName(validateDto.lobby),
       name: player?.room !== validateDto.lobby,
     };
+  }
+
+  private playerListMulticast(room: string) {
+    this.roomRepository.multicast(
+      room,
+      JSON.stringify({
+        event: 'playersList',
+        data: this.playerRepository.findByRoom(room).map((pl) => ({
+          name: pl.name,
+          score: pl.scoreSingle ?? 0,
+          pvp: pl.scoreMulti ?? 0,
+          role: pl.role,
+        })),
+      })
+    );
   }
 }

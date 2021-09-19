@@ -39,12 +39,14 @@ export class PlayerDto {
     this.channels = [channel];
     this.room = room;
     this.role = role;
-    repository.findOne(name).then((data) => {
+  }
+
+  async loadFromDB() {
+    await this.repository.findOne(this.name).then((data) => {
       this.scoreMulti = Number(data?.scoreMulti ?? 0);
       this.scoreSingle = Number(data?.scoreSingle ?? 0);
     });
   }
-
   _terrain: Terrain;
 
   get terrain(): string[] {

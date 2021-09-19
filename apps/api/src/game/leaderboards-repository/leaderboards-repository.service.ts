@@ -15,20 +15,23 @@ export class LeaderboardsRepositoryService {
   constructor(
     @InjectRepository(ScoreEntity)
     private readonly repository: Repository<ScoreEntity>
-  ) {
-    this.updateTop();
-  }
-  @OnEvent('game.update_top')
+  ) {}
+  @OnEvent('game.updateTop')
   updateTop() {
-    this.repository.findAndCount({ take: 10, order: {scoreSingle: "DESC", scoreMulti: "DESC"} }).then((data) => {
-      this.store$.next(
-        data[0].map((entry) => ({
-          name: entry.player,
-          pvp: Number(entry.scoreMulti),
-          score: Number(entry.scoreSingle),
-        }))
-      );
-    });
+    return this.repository
+      .findAndCount({
+        take: 10,
+        order: { scoreSingle: 'DESC', scoreMulti: 'DESC' },
+      })
+      .then((data) => {
+        this.store$.next(
+          data[0].map((entry) => ({
+            name: entry.player,
+            pvp: Number(entry.scoreMulti),
+            score: Number(entry.scoreSingle),
+          }))
+        );
+      });
   }
 
   getTop(): Observable<LeaderboardsDto[]> {
