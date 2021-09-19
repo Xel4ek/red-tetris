@@ -138,8 +138,9 @@ export class Terrain {
       if (!this.validate()) {
         this.y = posY;
         this.resetPiece();
-        this.share();
         break;
+      } else {
+        this.share();
       }
     }
     return this;
@@ -246,6 +247,7 @@ export class Terrain {
       this,
       this.pieceGenerator
         .lastThree(this.pieceSerialNumber)
+        .map((code) => new Piece(code))
         .map((p) => {
           const formatted = Array.from(
             { length: Terrain.previewRow * (p.size + 1) },

@@ -9,7 +9,7 @@ export enum Pieces {
 }
 export class Piece {
   private piece: boolean[];
-  size: number;
+  readonly size: number;
   static readonly pieceList: Readonly<Record<Pieces, boolean[]>> = {
     I: [
       false,
@@ -58,7 +58,7 @@ export class Piece {
 }
 
 export class PieceGenerator {
-  private store = [];
+  private store: Pieces[] = [];
   private static tailSize = 4;
   private static pieceCount = Object.keys(Pieces);
   constructor() {
@@ -67,22 +67,20 @@ export class PieceGenerator {
     }
   }
   private static generate() {
-    return new Piece(
-      Pieces[
-        PieceGenerator.pieceCount[
-          Math.floor(Math.random() * PieceGenerator.pieceCount.length)
-        ]
+    return Pieces[
+      PieceGenerator.pieceCount[
+        Math.floor(Math.random() * PieceGenerator.pieceCount.length)
       ]
-    );
+    ];
   }
-  getByIndex(i: number) {
+  getByIndex(i: number): Piece {
     if (i + PieceGenerator.tailSize === this.store.length) {
       this.store.push(PieceGenerator.generate());
     }
-    return this.store[i];
+    return new Piece(this.store[i]);
   }
 
-  lastThree(since: number): Piece[] {
+  lastThree(since: number): Pieces[] {
     return this.store.slice(since + 1, since + PieceGenerator.tailSize);
   }
 }
