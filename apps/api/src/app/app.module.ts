@@ -4,8 +4,28 @@ import { GameModule } from '../game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ScoreEntity } from '../game/entities/score.entity';
+
+const getOptions = (): TypeOrmModuleOptions => {
+  const connectionOptions: Partial<TypeOrmModuleOptions> = {
+    type: 'postgres',
+    logging: false,
+    synchronize: false,
+  };
+  if (process.env.DATABASE_URL) {
+    return { ...connectionOptions, url: process.env.DATABASE_URL };
+  } else {
+    return {
+      ...connectionOptions,
+      host: process.env.TYPEORM_HOST,
+      port: +process.env.TYPEORM_PORT,
+      username: process.env.TYPEORM_USERNAME,
+      password: process.env.TYPEORM_PASSWORD,
+      database: process.env.TYPEORM_DATABASE,
+    };
+  }
+};
 
 @Module({
   imports: [
@@ -14,18 +34,10 @@ import { ScoreEntity } from '../game/entities/score.entity';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../..', 'dist/apps/client'),
     }),
-    TypeOrmModule.forRoot(
-      {
-        type: 'postgres',
-        host: process.env["TYPEORM_HOST"],
-        port: Number(process.env["TYPEORM_PORT"]),
-        username: process.env["TYPEORM_USERNAME"],
-        password: process.env["TYPEORM_PASSWORD"],
-        database: process.env["TYPEORM_DATABASE"],
-        entities: [ScoreEntity],
-        synchronize: true,
-        autoLoadEntities: true,
-      }),
+    TypeOrmModule.forRoot({
+      ...getOptions(),
+      entities: [ScoreEntity],
+    }),
   ],
 
   controllers: [],
