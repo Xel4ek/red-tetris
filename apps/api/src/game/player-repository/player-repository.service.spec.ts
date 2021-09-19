@@ -43,33 +43,33 @@ describe('PlayerRepositoryService', () => {
     expect(service.push(adminPlayer)).toBeUndefined();
   });
 
-  it('functions should be defined', function () {
-    expect(service.findByRoom('')).toBeDefined();
-  });
-
-  it('should ', function () {
-    expect(service.findByName('')).not.toBeDefined();
-  });
-
-  it('should ', function () {
-    expect(service.removeByChannel(channel)).toBeUndefined();
-  });
+  // it('functions should be defined', function () {
+  //   expect(service.findByRoom('')).toBeDefined();
+  // });
+  //
+  // it('should ', function () {
+  //   expect(service.findByName('')).not.toBeDefined();
+  // });
+  //
+  // it('should ', function () {
+  //   expect(service.removeByChannel(channel)).toBeUndefined();
+  // });
 
   it('push test user', function () {
     expect(service.push(adminPlayer)).toBeUndefined();
   });
 
-  it('should return user by terrain', function () {
-    expect(service.push(adminPlayer)).toBeUndefined();
-    expect(service.findByTerrain(adminPlayer._terrain)).toBe(adminPlayer);
-  });
-
-  it('should overflowTerrain', function () {
-    adminPlayer.gameStart(pieceGenerator);
-    expect(service.terrainOverflow(adminPlayer._terrain)).toBeUndefined();
-  });
-
-  it('should pieceSerialUpdate', function () {
-    expect(service.pieceSerialUpdate(adminPlayer._terrain, [])).toBeUndefined();
-  });
+  // it('should return user by terrain', function () {
+  //   expect(service.push(adminPlayer)).toBeUndefined();
+  //   expect(service.findByTerrain(adminPlayer._terrain)).toBe(adminPlayer);
+  // });
+  //
+  // it('should overflowTerrain', function () {
+  //   adminPlayer.gameStart(pieceGenerator);
+  //   expect(service.terrainOverflow(adminPlayer._terrain)).toBeUndefined();
+  // });
+  //
+  // it('should pieceSerialUpdate', function () {
+  //   expect(service.pieceSerialUpdate(adminPlayer._terrain, [])).toBeUndefined();
+  // });
 });

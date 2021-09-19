@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { GameRoutingModule } from './game-routing.module';
 import { MainComponent } from './main/main.component';
-import { TerrainModule } from './terrain/terrain.module';
+import { TerrainModule } from '../terrain/terrain.module';
 import { InitGameComponent } from './init-game/init-game.component';
 import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';

@@ -121,13 +121,18 @@ export class GameService {
       .findByRoom(roomName)
       .filter((pl) => pl.role >= Role.PLAYER);
     const player = players.find((pl) => pl.status === GameStatus.WINNER);
-    const scoreEntity = (await this.scoreRepository.findOne({
-      player: player.name,
-    })) ?? {
-      player: player.name,
-      scoreSingle: BigInt(0),
-      scoreMulti: BigInt(0),
-    };
+    const scoreEntity = await this.scoreRepository
+      .findOne({
+        player: player.name,
+      })
+      .then(
+        (data) =>
+          data ?? {
+            player: player.name,
+            scoreSingle: BigInt(0),
+            scoreMulti: BigInt(0),
+          }
+      );
     if (players.length === 1) {
       scoreEntity.scoreSingle = BigInt(
         Math.max(Number(scoreEntity.scoreSingle), player._terrain.score)
@@ -143,7 +148,7 @@ export class GameService {
         })
       );
     }
-    await this.scoreRepository.save(scoreEntity);
+    await this.scoreRepository.save(scoreEntity).catch(console.log);
     this.playerListMulticast(player.room);
     this.leaderboardsRepository
       .getTop()

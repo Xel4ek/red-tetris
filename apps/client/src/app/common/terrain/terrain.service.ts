@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { WebsocketService } from '../../../core/services/websocket/websocket.service';
+import { WebsocketService } from '../../core/services/websocket/websocket.service';
 
 export enum GameStatus {
   DISCONNECTED,

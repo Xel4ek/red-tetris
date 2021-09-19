@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { Profile } from '../../../core/interfaces/profile';
 import { Role } from '../../../core/interfaces/role';
 import { ProfileService } from '../../../core/services/profile/profile.service';
-import { WebsocketService } from '../../../core/services/websocket/websocket.service';
 import {
   GameControlService,
   PlayerDto,
@@ -24,9 +23,9 @@ export class InitGameComponent {
     '2': 'Player',
     '3': 'Admin',
   };
+
   constructor(
     private readonly profileService: ProfileService,
-    private readonly ws: WebsocketService,
     private readonly gameControlService: GameControlService
   ) {
     this.playerList$ = gameControlService.playersList();

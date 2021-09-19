@@ -8,47 +8,48 @@ import {
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/compiler';
 import { InitGameComponent } from '../../../common/game/init-game/init-game.component';
 import { By } from '@angular/platform-browser';
-import { WebsocketService } from '../../services/websocket/websocket.service';
 import { GameControlService } from '../../services/game-control/game-control.service';
 import { ProfileService } from '../../services/profile/profile.service';
-import { config } from '../../services/websocket/websocket.config';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Role } from '../../interfaces/role';
-import { BehaviorSubject } from 'rxjs';
+import { of } from 'rxjs';
 import { NO_ERRORS_SCHEMA, ViewContainerRef } from '@angular/core';
 
 describe('SecureDirective', () => {
   let fixture: ComponentFixture<InitGameComponent>;
-  let profileService: ProfileService;
   let viewContainerRef: Partial<ViewContainerRef>;
+  let profileService: Partial<ProfileService>;
   beforeEach(() => {
     viewContainerRef = {
       createEmbeddedView: jest.fn(),
       clear: jest.fn(),
     };
+    profileService = {
+      profile: jest.fn().mockImplementation(() =>
+        of({
+          role: Role.ADMIN,
+          inGame: false,
+          name: 'testName',
+          room: 'testRoom',
+        })
+      ),
+    };
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
       declarations: [SecureDirective, InitGameComponent],
       providers: [
-        { provide: config, useValue: { url: 'test' } },
-        WebsocketService,
-        GameControlService,
-        ProfileService,
+        {
+          provide: GameControlService,
+          useValue: {
+            playersList: () => of(['test']),
+          },
+        },
+        { provide: ProfileService, useValue: profileService },
         ViewContainerRef,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
     }).compileComponents();
-    const subject = new BehaviorSubject({
-      role: Role.ADMIN,
-      inGame: false,
-      name: 'testName',
-      room: 'testRoom',
-    });
-    profileService = TestBed.inject(ProfileService);
-    jest
-      .spyOn(profileService, 'profile')
-      .mockImplementation(() => subject.asObservable());
     fixture = TestBed.createComponent(InitGameComponent);
     fixture.detectChanges();
   });

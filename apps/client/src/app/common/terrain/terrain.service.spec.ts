@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { GameStatus, TerrainService } from './terrain.service';
-import { WebsocketService } from '../../../core/services/websocket/websocket.service';
+import { WebsocketService } from '../../core/services/websocket/websocket.service';
 import { BehaviorSubject, of } from 'rxjs';
 
 describe('TerrainService', () => {

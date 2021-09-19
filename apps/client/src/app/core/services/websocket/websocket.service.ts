@@ -50,7 +50,7 @@ export class WebsocketService {
       );
   }
 
-  send<T>(event: string, data: T): void {
+  send<T>(event: string, data?: T): void {
     this.websocket$.next({ event, data });
   }
 
