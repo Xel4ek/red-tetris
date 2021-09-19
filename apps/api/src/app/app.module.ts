@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { GameModule } from '../game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -12,9 +11,16 @@ const getOptions = (): TypeOrmModuleOptions => {
     type: 'postgres',
     logging: false,
     synchronize: false,
+    entities: [ScoreEntity],
   };
   if (process.env.DATABASE_URL) {
-    return { ...connectionOptions, url: process.env.DATABASE_URL };
+    return {
+      ...connectionOptions,
+      url: process.env.DATABASE_URL,
+      extra: {
+        ssl: true,
+      },
+    };
   } else {
     return {
       ...connectionOptions,
@@ -34,10 +40,7 @@ const getOptions = (): TypeOrmModuleOptions => {
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../..', 'dist/apps/client'),
     }),
-    TypeOrmModule.forRoot({
-      ...getOptions(),
-      entities: [ScoreEntity],
-    }),
+    TypeOrmModule.forRoot(getOptions()),
   ],
 
   controllers: [],
