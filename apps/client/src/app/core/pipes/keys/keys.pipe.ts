@@ -17,7 +17,6 @@ export class KeysPipe implements PipeTransform {
   transform<K extends string, V>(
     input: Record<K, V> | ReadonlyMap<K, V> | null | undefined
   ): string[] | null {
-    if (input) return Object.keys(input);
-    return null;
+    return input ? Object.keys(input) : null;
   }
 }
