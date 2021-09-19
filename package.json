@@ -10,7 +10,7 @@
     "start:dev:db": " ./apps/api/src/scripts/start-db.sh",
     "start": "ng serve",
     "build": "nx run api:build:production && nx run client:build:production",
-    "test": "ng test",
+    "test": "nx run-many --all --target=test --detectOpenHandles",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
     "affected:apps": "nx affected:apps",

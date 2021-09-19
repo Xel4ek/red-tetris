@@ -60,6 +60,9 @@ describe('Terrain', () => {
       expect(
         terrain.piece.show().some((value, idx) => value != piece[idx])
       ).toBeTruthy();
+    //
+  });
+  it('should rotate#2', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     jest.spyOn(terrain, 'validate').mockImplementation(() => false);
@@ -69,24 +72,15 @@ describe('Terrain', () => {
     expect(rotate).toBeCalledTimes(4);
   });
 
-  it('updateScore should be undefined', () => {
-    expect(terrain.updateScore(1)).toBeUndefined();
-  });
-
-  it('missRow should be undefined', function () {
-    expect(terrain.missRow(1)).toBeUndefined();
-  });
-
-  it('should start', function () {
-    expect(terrain.start()).toBeUndefined();
-  });
-
   it('should return status', function () {
     expect(terrain.status()).toBeDefined();
   });
 
   it('should stop', function () {
-    expect(terrain.stop()).toBeUndefined();
+    terrain.start();
+    terrain.updateScore(1);
+    terrain.missRow(1);
+    expect(terrain).toBeTruthy();
   });
 
   it('should move', function () {
@@ -104,5 +98,8 @@ describe('Terrain', () => {
 
   it('should merge', function () {
     expect(terrain.merge()).toBeDefined();
+  });
+  afterEach(() => {
+    terrain.stop();
   });
 });

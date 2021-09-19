@@ -57,6 +57,7 @@ describe('Player', () => {
   it('should gameStart', () => {
     player.gameStart(new PieceGenerator());
     expect(player._terrain).toBeTruthy();
+    player._terrain.stop();
   });
 
   it('should be winner/loser', () => {
