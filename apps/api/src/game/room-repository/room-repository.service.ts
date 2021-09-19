@@ -63,7 +63,6 @@ export class RoomRepositoryService {
       }
     });
     this.profileMulticast(room);
-    // console.log('Game stopped at ', room);
   }
 
   getByName(roomName: string) {

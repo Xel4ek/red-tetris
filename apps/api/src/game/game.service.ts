@@ -164,7 +164,6 @@ export class GameService {
         })
       )
       .subscribe();
-    // console.log('stop game in room, winner: ', player);
   }
 
   leaderboards(): Observable<WsMessage<LeaderboardsDto[]>> {

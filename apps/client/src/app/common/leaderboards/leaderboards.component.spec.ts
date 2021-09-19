@@ -10,6 +10,7 @@ describe('LeaderboardsComponent', () => {
   let fixture: ComponentFixture<LeaderboardsComponent>;
   beforeEach(async () => {
     webService = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       on(): Observable<any> {
         return of([
           {

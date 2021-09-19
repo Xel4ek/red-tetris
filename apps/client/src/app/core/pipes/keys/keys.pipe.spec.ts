@@ -10,4 +10,7 @@ describe('KeysPipe', () => {
       pipe.transform({ test: {}, test2: 'some string', test3: 42 })
     ).toEqual(['test', 'test2', 'test3']);
   });
+  it('should null', () => {
+    expect(pipe.transform(undefined)).toBeNull();
+  });
 });

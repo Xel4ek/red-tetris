@@ -1,76 +1,35 @@
-// tslint:disable
-import { TestBed } from '@angular/core/testing';
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  Directive,
-  Injectable,
-  Input,
-  NO_ERRORS_SCHEMA,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TerrainComponent } from './terrain.component';
 import { TerrainService } from './terrain.service';
-
-@Injectable()
-class MockTerrainService {
-  status = function () {};
-}
-
-@Directive({ selector: '[oneviewPermitted]' })
-class OneviewPermittedDirective {
-  @Input() oneviewPermitted: any;
-}
-
-@Pipe({ name: 'translate' })
-class TranslatePipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'phoneNumber' })
-class PhoneNumberPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'safeHtml' })
-class SafeHtmlPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
+import { config } from '../../core/services/websocket/websocket.token';
 
 describe('TerrainComponent', () => {
-  let fixture: any;
-  let component: any;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule],
-      declarations: [
-        TerrainComponent,
-        TranslatePipe,
-        PhoneNumberPipe,
-        SafeHtmlPipe,
-        OneviewPermittedDirective,
-      ],
+  let fixture: ComponentFixture<TerrainComponent>;
+  let component: TerrainComponent;
+  let terrainService: Partial<TerrainService>;
+  beforeEach(async () => {
+    terrainService = {
+      status: jest.fn(),
+      terrain: jest.fn(),
+      subscribe: jest.fn(),
+    };
+    await TestBed.configureTestingModule({
+      declarations: [TerrainComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
-      providers: [{ provide: TerrainService, useClass: MockTerrainService }],
-    })
-      .overrideComponent(TerrainComponent, {
-        set: {
-          providers: [
-            { provide: TerrainService, useClass: MockTerrainService },
-          ],
+      providers: [
+        { provide: TerrainService, useValue: terrainService },
+        {
+          provide: config,
+          useValue: {
+            url: 'ws',
+          },
         },
-      })
-      .compileComponents();
+      ],
+    }).compileComponents();
     fixture = TestBed.createComponent(TerrainComponent);
     component = fixture.debugElement.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should run #constructor()', async () => {
@@ -78,18 +37,20 @@ describe('TerrainComponent', () => {
   });
 
   it('should run #trackFn()', async () => {
-    component.trackFn({});
+    expect(component.trackFn(5)).toEqual(5);
   });
 
   it('should run #drag()', async () => {
-    component.drag();
+    expect(component.drag()).toEqual(false);
   });
 
   it('should run #ngAfterViewInit()', async () => {
-    component.elementRef = component.elementRef || {};
-    component.elementRef.nativeElement = {
-      offsetWidth: {},
-    };
     component.ngAfterViewInit();
+  });
+
+  it('should input', () => {
+    component.player = 'test';
+    fixture.detectChanges();
+    expect(component.terrain$).toBeTruthy();
   });
 });

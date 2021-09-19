@@ -39,7 +39,6 @@ describe('Terrain', () => {
 
   it('should move', function () {
     terrain.start();
-    // console.log(terrain.status());
     expect(terrain.move('d')).toBeDefined();
     expect(terrain.move('l')).toBeDefined();
     expect(terrain.move('l')).toBeDefined();

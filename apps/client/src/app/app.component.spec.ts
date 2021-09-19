@@ -1,62 +1,17 @@
-// tslint:disable
-import { TestBed } from '@angular/core/testing';
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  Directive,
-  Input,
-  NO_ERRORS_SCHEMA,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { AppComponent } from './app.component';
-import { RouterTestingModule } from "@angular/router/testing";
-
-@Directive({ selector: '[oneviewPermitted]' })
-class OneviewPermittedDirective {
-  @Input() oneviewPermitted: any;
-}
-
-@Pipe({ name: 'translate' })
-class TranslatePipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'phoneNumber' })
-class PhoneNumberPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'safeHtml' })
-class SafeHtmlPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
 
 describe('AppComponent', () => {
-  let fixture: any;
-  let component: any;
+  let fixture: ComponentFixture<AppComponent>;
+  let component: AppComponent;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule, RouterTestingModule],
-      declarations: [
-        AppComponent,
-        TranslatePipe,
-        PhoneNumberPipe,
-        SafeHtmlPipe,
-        OneviewPermittedDirective,
-      ],
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [AppComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
       providers: [],
-    })
-      .overrideComponent(AppComponent, {})
-      .compileComponents();
+    }).compileComponents();
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.debugElement.componentInstance;
   });

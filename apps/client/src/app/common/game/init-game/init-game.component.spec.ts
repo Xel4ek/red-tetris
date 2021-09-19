@@ -1,81 +1,34 @@
-import { TestBed } from '@angular/core/testing';
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  Directive,
-  Injectable,
-  Input,
-  NO_ERRORS_SCHEMA,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { InitGameComponent } from './init-game.component';
 import { ProfileService } from '../../../core/services/profile/profile.service';
 import { GameControlService } from '../../../core/services/game-control/game-control.service';
 import { WebsocketService } from '../../../core/services/websocket/websocket.service';
 
-@Injectable()
-class MockProfileService {
-  profile = function () {};
-}
-
-@Injectable()
-class MockWebsocketService {}
-
-@Injectable()
-class MockGameControlService {
-  playersList = function () {};
-}
-
-@Directive({ selector: '[oneviewPermitted]' })
-class OneviewPermittedDirective {
-  @Input() oneviewPermitted: any;
-}
-
-@Pipe({ name: 'translate' })
-class TranslatePipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'phoneNumber' })
-class PhoneNumberPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
-@Pipe({ name: 'safeHtml' })
-class SafeHtmlPipe implements PipeTransform {
-  transform(value: any) {
-    return value;
-  }
-}
-
 describe('InitGameComponent', () => {
-  let fixture: any;
-  let component: any;
+  let fixture: ComponentFixture<InitGameComponent>;
+  let component: InitGameComponent;
+  let profileService: Partial<ProfileService>;
+  let websocketService: Partial<WebsocketService>;
+  let gameControlService: Partial<GameControlService>;
+  beforeEach(async () => {
+    profileService = {
+      profile: jest.fn(),
+    };
+    gameControlService = {
+      playersList: jest.fn(),
+      startGame: jest.fn(),
+    };
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule],
-      declarations: [
-        InitGameComponent,
-        TranslatePipe,
-        PhoneNumberPipe,
-        SafeHtmlPipe,
-        OneviewPermittedDirective,
-      ],
+    await TestBed.configureTestingModule({
+      declarations: [InitGameComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
       providers: [
-        { provide: ProfileService, useClass: MockProfileService },
-        { provide: WebsocketService, useClass: MockWebsocketService },
-        { provide: GameControlService, useClass: MockGameControlService },
+        { provide: ProfileService, useValue: profileService },
+        { provide: WebsocketService, useValue: websocketService },
+        { provide: GameControlService, useValue: gameControlService },
       ],
-    })
-      .overrideComponent(InitGameComponent, {})
-      .compileComponents();
+    }).compileComponents();
     fixture = TestBed.createComponent(InitGameComponent);
     component = fixture.debugElement.componentInstance;
   });
@@ -85,9 +38,7 @@ describe('InitGameComponent', () => {
   });
 
   it('should run #startGame()', async () => {
-    component.gameControlService = component.gameControlService || {};
-    component.gameControlService.startGame = jest.fn();
     component.startGame();
-    // expect(component.gameControlService.startGame).toHaveBeenCalled();
+    expect(gameControlService.startGame).toBeCalled();
   });
 });

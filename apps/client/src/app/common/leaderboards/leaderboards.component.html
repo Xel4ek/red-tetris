@@ -29,7 +29,6 @@
     <mat-header-cell *matHeaderCellDef> Multi Player </mat-header-cell>
     <mat-cell *matCellDef="let element"> {{ element.pvp }} </mat-cell>
   </ng-container>
-
   <mat-header-row *matHeaderRowDef="leaderboards[0] | keys"></mat-header-row>
   <mat-row *matRowDef="let row; columns: leaderboards[0] | keys"></mat-row>
 </mat-table>

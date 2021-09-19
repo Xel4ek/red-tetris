@@ -10,6 +10,7 @@ import { WebSocketConfig } from './websocket.interfaces';
   providers: [WebsocketService],
 })
 export class WebsocketModule {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static config(wsConfig: WebSocketConfig): ModuleWithProviders<any> {
     return {
       ngModule: WebsocketModule,
