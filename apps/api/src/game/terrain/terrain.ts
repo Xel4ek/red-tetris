@@ -88,9 +88,9 @@ export class Terrain {
         ...Array.from({ length: rows * Terrain.width }, () => Terrain.border),
       ];
 
-      this.share();
     } else {
       this.eventEmitter.emit('terrain.overflow', this);
+      this.share();
     }
   }
 
@@ -133,8 +133,19 @@ export class Terrain {
     return this;
   }
   drop() {
-    //TODO DROP event implementation
+    for(;;) {
+      const posY = this.y;
+      this.y += 1;
+      if (!this.validate()) {
+        this.y = posY;
+        this.resetPiece();
+        this.share();
+        break;
+      }
+    }
+    return this;
   }
+
   merge(): string[] {
     const positionRow = this.y;
     const positionCol = this.x;
