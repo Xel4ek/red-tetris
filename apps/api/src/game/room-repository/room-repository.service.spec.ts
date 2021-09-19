@@ -130,4 +130,19 @@ describe('RoomRepositoryService', () => {
     service.disconnect({} as WebSocket);
     expect(service.profileMulticast).toBeCalled();
   });
+
+  it('should collapseRow', () => {
+    const miss = jest.fn();
+    jest.spyOn(playerRepository, 'findByTerrain');
+    jest.spyOn(playerRepository, 'findByRoom').mockImplementation(() => [
+      {
+        role: Role.PLAYER,
+        _terrain: {
+          missRow: miss,
+        },
+      } as never,
+    ]);
+    service.collapseRow({} as Terrain, 7);
+    expect(miss).toBeCalledWith(7);
+  });
 });
