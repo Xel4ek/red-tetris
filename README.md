@@ -4,7 +4,7 @@
 
 [Live server](https://red-tetris-project.herokuapp.com/)
 
-[21-school](https://21-school.ru/') project
+[21-school](https://21-school.ru/) project
 
 ![img.png](img.png)
 
