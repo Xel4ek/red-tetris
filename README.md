@@ -5,6 +5,7 @@
 [Live server](https://red-tetris-project.herokuapp.com/)
 
 [21-school](https://21-school.ru/') project
+
 ![img.png](img.png)
 
 The goal of this project is to develop a multiplayer tetris game on the network with a set of software exclusively
